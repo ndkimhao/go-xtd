@@ -4,7 +4,7 @@ import (
 	"sync/atomic"
 	"unsafe"
 
-	"github.com/ndkimhao/gostl/misc"
+	"github.com/ndkimhao/gstl/misc"
 )
 
 type Ptr[T any] struct {
