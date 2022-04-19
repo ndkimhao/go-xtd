@@ -50,12 +50,12 @@ func runTestPtr[T any](t *testing.T, typeName string) {
 			})
 			t.Run("CAS_fail", func(t *testing.T) {
 				p := test.newPtr()
-				assert.False(t, p.CAS(c, b))
+				assert.False(t, p.CompareAndSwap(c, b))
 				assert.Equal(t, test.init, p.Load())
 			})
 			t.Run("CAS_ok", func(t *testing.T) {
 				p := test.newPtr()
-				assert.True(t, p.CAS(test.init, b))
+				assert.True(t, p.CompareAndSwap(test.init, b))
 				assert.Equal(t, b, p.Load())
 			})
 		})

@@ -33,7 +33,7 @@ func (p *Ptr[T]) Swap(val *T) (old *T) {
 	return (*T)(atomic.SwapPointer(&p.v, unsafe.Pointer(val)))
 }
 
-// CAS executes the compare-and-swap operation for the wrapped pointer.
-func (p *Ptr[T]) CAS(old, new *T) (swapped bool) {
+// CompareAndSwap executes the compare-and-swap operation for the wrapped pointer.
+func (p *Ptr[T]) CompareAndSwap(old, new *T) (swapped bool) {
 	return atomic.CompareAndSwapPointer(&p.v, unsafe.Pointer(old), unsafe.Pointer(new))
 }
