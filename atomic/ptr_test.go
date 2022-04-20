@@ -1,4 +1,4 @@
-package atomic
+package atomic_test
 
 import (
 	"fmt"
@@ -6,7 +6,15 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+
+	. "github.com/ndkimhao/gstl/atomic"
 )
+
+func TestNewPtr(t *testing.T) {
+	i := 1
+	p := NewPtr(&i)
+	assert.Equal(t, &i, p.Load())
+}
 
 func runTestPtr[T any](t *testing.T, typeName string) {
 	a, b, c := new(T), new(T), new(T)

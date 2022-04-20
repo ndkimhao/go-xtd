@@ -4,8 +4,8 @@ import (
 	"github.com/ndkimhao/gstl/misc"
 )
 
-// Value is simpler than Go atomic.Value, however,
-// it does not support CompareAndSwap operation
+// Value wrapped a copiable value atomically
+// WARNING: Store, Swap, and CompareAndSwap operations do allocate
 type Value[T comparable] struct {
 	_ misc.NoCmpCopy
 
@@ -21,7 +21,12 @@ func NewValue[T comparable](val T) *Value[T] {
 
 // Load atomically loads the wrapped value.
 func (v *Value[T]) Load() T {
-	return *v.p.Load()
+	p := v.p.Load()
+	if p == nil {
+		var zero T
+		return zero
+	}
+	return *p
 }
 
 // Store atomically stores the passed value.
@@ -32,13 +37,23 @@ func (v *Value[T]) Store(val T) {
 
 // Swap atomically swaps the wrapped pointer and returns the old value.
 func (v *Value[T]) Swap(val T) (old T) {
-	return *v.p.Swap(&val)
+	p := v.p.Swap(&val)
+	if p == nil {
+		var zero T
+		return zero
+	}
+	return *p
 }
 
 // CompareAndSwap executes the compare-and-swap operation for the wrapped pointer.
 func (v *Value[T]) CompareAndSwap(old, new T) (swapped bool) {
 	p := v.p.Load()
-	if *p != old {
+	if p == nil {
+		var zero T
+		if zero != old {
+			return false
+		}
+	} else if *p != old {
 		return false
 	}
 	if new == old {
