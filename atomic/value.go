@@ -1,13 +1,13 @@
 package atomic
 
 import (
-	"github.com/ndkimhao/gstl/std"
+	"github.com/ndkimhao/gstl/xtd"
 )
 
 // Value wrapped a copiable value atomically
 // WARNING: Store, Swap, and CompareAndSwap operations do allocate
 type Value[T comparable] struct {
-	_ std.NoCmpCopy
+	_ xtd.NoCopy
 
 	p Ptr[T]
 }

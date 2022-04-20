@@ -4,11 +4,11 @@ import (
 	"sync/atomic"
 	"unsafe"
 
-	"github.com/ndkimhao/gstl/std"
+	"github.com/ndkimhao/gstl/xtd"
 )
 
 type Ptr[T any] struct {
-	_ std.NoCmpCopy
+	_ xtd.NoCopy
 
 	v unsafe.Pointer
 }
