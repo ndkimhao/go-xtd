@@ -1,4 +1,4 @@
-package misc
+package std
 
 func ZeroOf[T any]() T {
 	var zero T
