@@ -5,25 +5,24 @@ import (
 )
 
 type filter[T any] struct {
-	s    *Stream[T]
+	it   xtd.Iterator[T]
 	pred Predicate[T]
 
 	has  bool
 	last T
 }
 
-func newFilter[T any](s *Stream[T], pred Predicate[T]) *filter[T] {
-	return &filter[T]{s: s, pred: pred}
+func newFilter[T any](it xtd.Iterator[T], pred Predicate[T]) *filter[T] {
+	return &filter[T]{it: it, pred: pred}
 }
 
 func (f *filter[T]) fetch() {
 	if f.has {
 		return
 	}
-	for it := f.s.src; it.Has(); it = it.Next() {
-		if v := it.Get(); f.pred(v) {
-			f.has = true
-			f.last = v
+	for ; f.it.Has(); f.it = f.it.Next() {
+		if v := f.it.Get(); f.pred(v) {
+			f.has, f.last = true, v
 			return
 		}
 	}
@@ -55,14 +54,17 @@ func (f *filter[T]) Next() xtd.Iterator[T] {
 
 func (f *filter[T]) Skip(n int) (it xtd.Iterator[T], skipped int) {
 	f.fetch() // lazy fetch
-	cnt := 0
-	for i := 0; i < n; i++ {
-		if !f.has {
-			break
+	x := 0
+	for ; x < n && f.it.Has(); f.it = f.it.Next() {
+		if v := f.it.Get(); f.pred(v) {
+			x++
+			if x == n {
+				f.has, f.last = true, v
+				return f, x
+			}
 		}
-		f.has = false
-		f.fetch()
-		cnt++
 	}
-	return f, cnt
+	var zero T
+	f.has, f.last = false, zero
+	return it, x
 }
