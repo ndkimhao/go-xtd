@@ -1,10 +1,12 @@
 package stream
 
 import (
-	"github.com/ndkimhao/gstl/xtd"
+	"github.com/ndkimhao/go-xtd/xtd"
 )
 
 type filter[T any] struct {
+	_ xtd.NoCopy
+
 	it   xtd.Iterator[T]
 	pred Predicate[T]
 
@@ -20,8 +22,8 @@ func (f *filter[T]) fetch() {
 	if f.has {
 		return
 	}
-	for ; f.it.Has(); f.it = f.it.Next() {
-		if v := f.it.Get(); f.pred(v) {
+	for it := f.it; it.Has(); it = it.Next() {
+		if v := it.Get(); f.pred(v) {
 			f.has, f.last = true, v
 			return
 		}
@@ -52,11 +54,12 @@ func (f *filter[T]) Next() xtd.Iterator[T] {
 	return f
 }
 
-func (f *filter[T]) Skip(n int) (it xtd.Iterator[T], skipped int) {
+func (f *filter[T]) Skip(n int) (iterator xtd.Iterator[T], skipped int) {
 	f.fetch() // lazy fetch
 	x := 0
-	for ; x < n && f.it.Has(); f.it = f.it.Next() {
-		if v := f.it.Get(); f.pred(v) {
+	it := f.it
+	for ; x < n && it.Has(); it = it.Next() {
+		if v := it.Get(); f.pred(v) {
 			x++
 			if x == n {
 				f.has, f.last = true, v

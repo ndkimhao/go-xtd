@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/ndkimhao/gstl/vec"
+	"github.com/ndkimhao/go-xtd/vec"
 )
 
 func TestOf(t *testing.T) {

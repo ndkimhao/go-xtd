@@ -7,12 +7,12 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	. "github.com/ndkimhao/gstl/atomic"
+	"github.com/ndkimhao/go-xtd/atomic"
 )
 
 func TestNewPtr(t *testing.T) {
 	i := 1
-	p := NewPtr(&i)
+	p := atomic.NewPtr(&i)
 	assert.Equal(t, &i, p.Load())
 }
 
@@ -21,22 +21,22 @@ func runTestPtr[T any](t *testing.T, typeName string) {
 
 	tests := []struct {
 		name   string
-		newPtr func() *Ptr[T]
+		newPtr func() *atomic.Ptr[T]
 		init   *T
 	}{
 		{
 			name:   "Normal",
-			newPtr: func() *Ptr[T] { return NewPtr[T](a) },
+			newPtr: func() *atomic.Ptr[T] { return atomic.NewPtr[T](a) },
 			init:   a,
 		},
 		{
 			name:   "Nil",
-			newPtr: func() *Ptr[T] { return NewPtr[T](nil) },
+			newPtr: func() *atomic.Ptr[T] { return atomic.NewPtr[T](nil) },
 			init:   nil,
 		},
 		{
 			name:   "Zero",
-			newPtr: func() *Ptr[T] { return new(Ptr[T]) },
+			newPtr: func() *atomic.Ptr[T] { return new(atomic.Ptr[T]) },
 			init:   nil,
 		},
 	}

@@ -1,4 +1,4 @@
-module github.com/ndkimhao/gstl
+module github.com/ndkimhao/go-xtd
 
 go 1.18
 

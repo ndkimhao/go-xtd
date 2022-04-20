@@ -1,7 +1,7 @@
 package atomic
 
 import (
-	"github.com/ndkimhao/gstl/xtd"
+	"github.com/ndkimhao/go-xtd/xtd"
 )
 
 // Value wrapped a copiable value atomically

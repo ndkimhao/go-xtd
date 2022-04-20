@@ -4,7 +4,7 @@ import (
 	"sync/atomic"
 	"unsafe"
 
-	"github.com/ndkimhao/gstl/xtd"
+	"github.com/ndkimhao/go-xtd/xtd"
 )
 
 type Ptr[T any] struct {

@@ -8,23 +8,23 @@ import (
 	"math/rand"
 	"runtime"
 	"sync"
-	"sync/atomic"
+	std_atomic "sync/atomic"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
-	. "github.com/ndkimhao/gstl/atomic"
+	"github.com/ndkimhao/go-xtd/atomic"
 )
 
 func TestNewValue(t *testing.T) {
-	vInt := NewValue[int](1)
+	vInt := atomic.NewValue[int](1)
 	assert.Equal(t, 1, vInt.Load())
-	vString := NewValue[string]("hello")
+	vString := atomic.NewValue[string]("hello")
 	assert.Equal(t, "hello", vString.Load())
 }
 
 func TestValue_int(t *testing.T) {
-	var v Value[int]
+	var v atomic.Value[int]
 	assert.Equal(t, 0, v.Load())
 	v.Store(42)
 	assert.Equal(t, 42, v.Load())
@@ -33,7 +33,7 @@ func TestValue_int(t *testing.T) {
 }
 
 func TestValue_string(t *testing.T) {
-	var v Value[string]
+	var v atomic.Value[string]
 	assert.Equal(t, "", v.Load())
 	v.Store("foo")
 	assert.Equal(t, "foo", v.Load())
@@ -48,7 +48,7 @@ func doTestValue_Concurrent[T comparable](t *testing.T, test []T) {
 		p /= 2
 		N = 1e3
 	}
-	var v Value[T]
+	var v atomic.Value[T]
 	done := make(chan bool, p)
 	for i := 0; i < p; i++ {
 		go func() {
@@ -86,7 +86,7 @@ func TestValue_Concurrent(t *testing.T) {
 }
 
 func BenchmarkValueRead(b *testing.B) {
-	var v Value[int]
+	var v atomic.Value[int]
 	v.Store(123)
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
@@ -100,20 +100,20 @@ func BenchmarkValueRead(b *testing.B) {
 
 func TestValue_Swap(t *testing.T) {
 	// Int
-	var vInt Value[int]
+	var vInt atomic.Value[int]
 	assert.Equal(t, 0, vInt.Swap(1))
 	assert.Equal(t, 1, vInt.Load())
 	assert.Equal(t, 1, vInt.Swap(2))
 	assert.Equal(t, 2, vInt.Load())
 
 	// String
-	var vString Value[string]
+	var vString atomic.Value[string]
 	assert.Equal(t, "", vString.Swap("hello"))
 	assert.Equal(t, "hello", vString.Swap("world"))
 }
 
 func TestValueSwap_Concurrent(t *testing.T) {
-	var v Value[uint64]
+	var v atomic.Value[uint64]
 	var count uint64
 	var g sync.WaitGroup
 	var m, n uint64 = 10000, 10000
@@ -129,7 +129,7 @@ func TestValueSwap_Concurrent(t *testing.T) {
 			for newV := i; newV < i+n; newV++ {
 				c += v.Swap(newV)
 			}
-			atomic.AddUint64(&count, c)
+			std_atomic.AddUint64(&count, c)
 			g.Done()
 		}()
 	}
@@ -139,7 +139,7 @@ func TestValueSwap_Concurrent(t *testing.T) {
 
 func TestValue_CompareAndSwap(t *testing.T) {
 	// Int
-	var vInt Value[int]
+	var vInt atomic.Value[int]
 	assert.False(t, vInt.CompareAndSwap(1, 2))
 	assert.Equal(t, 0, vInt.Load())
 	assert.True(t, vInt.CompareAndSwap(0, 1))
@@ -150,7 +150,7 @@ func TestValue_CompareAndSwap(t *testing.T) {
 	assert.Equal(t, 2, vInt.Load())
 
 	// String
-	var vString Value[string]
+	var vString atomic.Value[string]
 	assert.False(t, vString.CompareAndSwap("a", "b"))
 	assert.Equal(t, "", vString.Load())
 	assert.True(t, vString.CompareAndSwap("", ""))
@@ -164,7 +164,7 @@ func TestValue_CompareAndSwap(t *testing.T) {
 }
 
 func TestValueCompareAndSwap_Concurrent(t *testing.T) {
-	var v Value[int]
+	var v atomic.Value[int]
 	var w sync.WaitGroup
 	v.Store(0)
 	m, n := 1000, 100

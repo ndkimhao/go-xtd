@@ -1,7 +1,7 @@
 package stream
 
 import (
-	"github.com/ndkimhao/gstl/xtd"
+	"github.com/ndkimhao/go-xtd/xtd"
 )
 
 type Predicate[T any] func(value T) bool
