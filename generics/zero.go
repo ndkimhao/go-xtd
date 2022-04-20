@@ -1,4 +1,4 @@
-package xtd
+package generics
 
 func ZeroOf[T any]() T {
 	var zero T

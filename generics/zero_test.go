@@ -1,4 +1,4 @@
-package xtd
+package generics
 
 import (
 	"testing"
