@@ -37,29 +37,9 @@ func (tts *typeTransformerStream[T, R]) SkipNext(n int) (skipped int) {
 	return tts.s.SkipNext(n)
 }
 
-type predSkip[T any] struct {
-	skip int
-}
-
-type predLimit[T any] struct {
-	limit int
-}
-
-func (ps *predSkip[T]) keep() bool {
-	if ps.skip > 0 {
-		ps.skip--
-		return false
-	}
-	return true
-}
-
-func (pl *predLimit[T]) keep() bool {
-	if pl.limit > 0 {
-		pl.limit--
-		return true
-	}
-	return false
-}
+// use int to avoid allocation when storing in `ops []any`
+type predSkip int
+type predLimit int
 
 type Stream[T any] struct {
 	_ xtd.NoCopy
@@ -82,18 +62,21 @@ func (s *Stream[T]) Next() (value T, ok bool) {
 	}
 loop_src:
 	for v, hasNext := s.src.Next(); hasNext; v, hasNext = s.src.Next() {
-		for _, oAny := range s.ops {
+		for i, oAny := range s.ops {
 			switch op := oAny.(type) {
 			case Predicate[T]:
 				if !op(v) {
 					continue loop_src
 				}
-			case *predSkip[T]:
-				if !op.keep() {
+			case predSkip:
+				if op > 0 {
+					s.ops[i] = op - 1
 					continue loop_src
 				}
-			case *predLimit[T]:
-				if !op.keep() {
+			case predLimit:
+				if op > 0 {
+					s.ops[i] = op - 1
+				} else {
 					continue loop_src
 				}
 			case Transformer[T]:
@@ -115,7 +98,7 @@ func (s *Stream[T]) SkipNext(n int) (skipped int) {
 	return -1
 }
 
-// Immediate operations
+// Intermediate operations
 
 func (s *Stream[T]) Map(transformer Transformer[T]) *Stream[T] {
 	if s.empty() {
@@ -146,7 +129,7 @@ func (s *Stream[T]) Skip(n int) *Stream[T] {
 		return s
 	}
 	s.hasPred = true
-	s.ops = append(s.ops, &predSkip[T]{skip: n})
+	s.ops = append(s.ops, predSkip(n))
 	return s
 }
 
@@ -158,7 +141,7 @@ func (s *Stream[T]) Limit(n int) *Stream[T] {
 		return s
 	}
 	s.hasPred = true
-	s.ops = append(s.ops, &predLimit[T]{limit: n})
+	s.ops = append(s.ops, predLimit(n))
 	return s
 }
 
