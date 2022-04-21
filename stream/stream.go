@@ -82,8 +82,17 @@ func NewStream[T any](source Iterator[T]) *Stream[T] {
 // Iterator interface
 
 func (s *Stream[T]) Next() (value T, ok bool) {
-	//TODO implement me
-	panic("implement me")
+loop_src:
+	for v, hasNext := s.src.Next(); hasNext; v, hasNext = s.src.Next() {
+		for _, o := range s.ops {
+			if keep := o.apply(&v); !keep {
+				continue loop_src
+			}
+		}
+		return v, true
+	}
+	var zero T
+	return zero, false
 }
 
 func (s *Stream[T]) SkipNext(n int) (skipped int) {
