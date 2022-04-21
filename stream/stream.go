@@ -46,12 +46,15 @@ type Stream[T any] struct {
 
 	src Iterator[T]
 	ops []any
+	buf [8]any
 
 	hasPred bool
 }
 
 func New[T any](source Iterator[T]) *Stream[T] {
-	return &Stream[T]{src: source}
+	s := &Stream[T]{src: source}
+	s.ops = s.buf[:0] // small slice optimization
+	return s
 }
 
 // Iterator interface
