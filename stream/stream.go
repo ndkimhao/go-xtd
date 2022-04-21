@@ -19,19 +19,6 @@ type Iterator[T any] interface {
 	SkipNext(n int) (skipped int)
 }
 
-type op[T any] interface {
-	apply(valuePtr *T) (keep bool)
-}
-
-func (p Predicate[T]) apply(valuePtr *T) (keep bool) {
-	return p(*valuePtr)
-}
-
-func (t Transformer[T]) apply(valuePtr *T) (keep bool) {
-	*valuePtr = t(*valuePtr)
-	return true
-}
-
 type typeTransformerStream[T any, R any] struct {
 	s *Stream[T]
 	t TypeTransformer[T, R]
@@ -50,18 +37,26 @@ func (tts *typeTransformerStream[T, R]) SkipNext(n int) (skipped int) {
 	return tts.s.SkipNext(n)
 }
 
-type predicateSkip[T any] struct {
-	p Predicate[T]
-	n int
+type predSkip[T any] struct {
+	skip int
 }
 
-func (ps *predicateSkip[T]) apply(valuePtr *T) (keep bool) {
-	if ps.p(*valuePtr) {
-		if ps.n <= 0 {
-			return true
-		} else {
-			ps.n--
-		}
+type predLimit[T any] struct {
+	limit int
+}
+
+func (ps *predSkip[T]) keep() bool {
+	if ps.skip > 0 {
+		ps.skip--
+		return false
+	}
+	return true
+}
+
+func (pl *predLimit[T]) keep() bool {
+	if pl.limit > 0 {
+		pl.limit--
+		return true
 	}
 	return false
 }
@@ -70,27 +65,47 @@ type Stream[T any] struct {
 	_ xtd.NoCopy
 
 	src Iterator[T]
-	ops []op[T]
+	ops []any
 
-	lastPred int
+	hasPred bool
 }
 
 func NewStream[T any](source Iterator[T]) *Stream[T] {
-	return &Stream[T]{src: source, lastPred: -1}
+	return &Stream[T]{src: source}
 }
 
 // Iterator interface
 
 func (s *Stream[T]) Next() (value T, ok bool) {
+	if s.empty() {
+		goto end_of_stream
+	}
 loop_src:
 	for v, hasNext := s.src.Next(); hasNext; v, hasNext = s.src.Next() {
-		for _, o := range s.ops {
-			if keep := o.apply(&v); !keep {
-				continue loop_src
+		for _, oAny := range s.ops {
+			switch op := oAny.(type) {
+			case Predicate[T]:
+				if !op(v) {
+					continue loop_src
+				}
+			case *predSkip[T]:
+				if !op.keep() {
+					continue loop_src
+				}
+			case *predLimit[T]:
+				if !op.keep() {
+					continue loop_src
+				}
+			case Transformer[T]:
+				v = op(v)
+			default:
+				panic("Stream.Next: internal error: invalid op")
 			}
 		}
 		return v, true
 	}
+end_of_stream:
+	s.clear()
 	var zero T
 	return zero, false
 }
@@ -103,12 +118,18 @@ func (s *Stream[T]) SkipNext(n int) (skipped int) {
 // Immediate operations
 
 func (s *Stream[T]) Map(transformer Transformer[T]) *Stream[T] {
+	if s.empty() {
+		return s
+	}
 	s.ops = append(s.ops, transformer)
 	return s
 }
 
 func (s *Stream[T]) Filter(predicate Predicate[T]) *Stream[T] {
-	s.lastPred = len(s.ops)
+	if s.empty() {
+		return s
+	}
+	s.hasPred = true
 	s.ops = append(s.ops, predicate)
 	return s
 }
@@ -117,19 +138,27 @@ func (s *Stream[T]) Skip(n int) *Stream[T] {
 	if n < 0 {
 		panic("Stream.Skip: negative value")
 	}
-	if n == 0 {
+	if s.empty() || n == 0 {
 		return s
 	}
-	if s.lastPred == -1 {
+	if !s.hasPred {
 		s.src.SkipNext(n)
 		return s
 	}
-	p := s.ops[s.lastPred]
-	if ps, ok := p.(*predicateSkip[T]); ok {
-		ps.n += n
-	} else {
-		s.ops[s.lastPred] = &predicateSkip[T]{p: p.(Predicate[T]), n: n}
+	s.hasPred = true
+	s.ops = append(s.ops, &predSkip[T]{skip: n})
+	return s
+}
+
+func (s *Stream[T]) Limit(n int) *Stream[T] {
+	if n < 0 {
+		panic("Stream.Limit: negative value")
 	}
+	if s.empty() {
+		return s
+	}
+	s.hasPred = true
+	s.ops = append(s.ops, &predLimit[T]{limit: n})
 	return s
 }
 
@@ -137,14 +166,19 @@ func Map[R any, T any](s *Stream[T], transformer TypeTransformer[T, R]) *Stream[
 	return NewStream[R](&typeTransformerStream[T, R]{s: s, t: transformer})
 }
 
+func (s *Stream[T]) clear() {
+	s.src = nil
+	s.ops = nil
+}
+
+func (s *Stream[T]) empty() bool {
+	return s.src == nil
+}
+
 // Terminating operations
 
 func (s *Stream[T]) ForEach(consumer Consumer[T]) {
-	for {
-		v, ok := s.Next()
-		if !ok {
-			break
-		}
+	for v, ok := s.Next(); ok; v, ok = s.Next() {
 		consumer(v)
 	}
 }
