@@ -1,5 +1,5 @@
 package xtd
 
-func PtrOf[T any](value T) *T {
+func Addr[T any](value T) *T {
 	return &value
 }
