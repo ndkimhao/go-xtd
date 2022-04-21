@@ -39,7 +39,7 @@ func (tts *typeTransformerStream[T, R]) SkipNext(n int) (skipped int) {
 
 // use int to avoid allocation when storing in `ops []any`
 type predSkip int
-type predLimit int
+type predTake int
 
 type Stream[T any] struct {
 	_ xtd.NoCopy
@@ -50,7 +50,7 @@ type Stream[T any] struct {
 	hasPred bool
 }
 
-func NewStream[T any](source Iterator[T]) *Stream[T] {
+func New[T any](source Iterator[T]) *Stream[T] {
 	return &Stream[T]{src: source}
 }
 
@@ -73,7 +73,7 @@ loop_src:
 					s.ops[i] = op - 1
 					continue loop_src
 				}
-			case predLimit:
+			case predTake:
 				if op > 0 {
 					s.ops[i] = op - 1
 				} else {
@@ -133,20 +133,20 @@ func (s *Stream[T]) Skip(n int) *Stream[T] {
 	return s
 }
 
-func (s *Stream[T]) Limit(n int) *Stream[T] {
+func (s *Stream[T]) Take(n int) *Stream[T] {
 	if n < 0 {
-		panic("Stream.Limit: negative value")
+		panic("Stream.Take: negative value")
 	}
 	if s.empty() {
 		return s
 	}
 	s.hasPred = true
-	s.ops = append(s.ops, predLimit(n))
+	s.ops = append(s.ops, predTake(n))
 	return s
 }
 
 func Map[R any, T any](s *Stream[T], transformer TypeTransformer[T, R]) *Stream[R] {
-	return NewStream[R](&typeTransformerStream[T, R]{s: s, t: transformer})
+	return New[R](&typeTransformerStream[T, R]{s: s, t: transformer})
 }
 
 func (s *Stream[T]) clear() {
@@ -198,4 +198,12 @@ func (s *Stream[T]) First() T {
 		panic("Stream.First: stream is empty")
 	}
 	return v
+}
+
+func (s *Stream[T]) Slice() []T {
+	var r []T
+	for v, ok := s.Next(); ok; v, ok = s.Next() {
+		r = append(r, v)
+	}
+	return r
 }
