@@ -119,6 +119,12 @@ func TestStream_Peek(t *testing.T) {
 	})
 }
 
+func TestStream_String(t *testing.T) {
+	t.Run("Simple", func(t *testing.T) {
+		assert.Equal(t, "Stream[int]{1, 2, 3}", stream.Of(1, 2, 3).String())
+	})
+}
+
 func TestMap(t *testing.T) {
 	t.Run("Simple", func(t *testing.T) {
 		r := stream.Map(stream.Range(0, 9, 3), strconv.Itoa).Slice()

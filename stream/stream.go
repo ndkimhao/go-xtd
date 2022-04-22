@@ -1,6 +1,10 @@
 package stream
 
 import (
+	"fmt"
+	"reflect"
+	"strings"
+
 	"github.com/ndkimhao/go-xtd/xtd"
 )
 
@@ -222,6 +226,24 @@ func (s *Stream[T]) Reduce(identity T, accumulator Accumulator[T, T]) T {
 		r = accumulator(r, v)
 	}
 	return r
+}
+
+func (s *Stream[T]) String() string {
+	var sb strings.Builder
+	sb.WriteString("Stream[")
+	sb.WriteString(reflect.TypeOf((*T)(nil)).Elem().Name())
+	sb.WriteString("]{")
+	first := true
+	s.Collect(func(value T) {
+		if first {
+			first = false
+		} else {
+			sb.WriteString(", ")
+		}
+		sb.WriteString(fmt.Sprint(value))
+	})
+	sb.WriteString("}")
+	return sb.String()
 }
 
 func Reduce[A, T any](s *Stream[T], identity A, accumulator Accumulator[A, T]) A {
