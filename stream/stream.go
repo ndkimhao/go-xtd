@@ -166,6 +166,30 @@ func (s *Stream[T]) empty() bool {
 	return s.src == nil
 }
 
+func (s *Stream[T]) MapToInt(transformer TypeTransformer[T, int]) *Stream[int] {
+	return Map(s, transformer)
+}
+
+func (s *Stream[T]) MapToString(transformer TypeTransformer[T, string]) *Stream[string] {
+	return Map(s, transformer)
+}
+
+func (s *Stream[T]) MapToBytes(transformer TypeTransformer[T, []byte]) *Stream[[]byte] {
+	return Map(s, transformer)
+}
+
+func (s *Stream[T]) MapToFloat(transformer TypeTransformer[T, float64]) *Stream[float64] {
+	return Map(s, transformer)
+}
+
+func (s *Stream[T]) MapToBool(transformer TypeTransformer[T, bool]) *Stream[bool] {
+	return Map(s, transformer)
+}
+
+func (s *Stream[T]) MapToAny(transformer TypeTransformer[T, any]) *Stream[any] {
+	return Map(s, transformer)
+}
+
 // Terminating operations
 
 func (s *Stream[T]) Collect(consumer Consumer[T]) {
