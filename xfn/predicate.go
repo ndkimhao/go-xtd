@@ -1,5 +1,11 @@
 package xfn
 
+import (
+	"bytes"
+
+	"github.com/ndkimhao/go-xtd/constraints"
+)
+
 type Predicate[T any] func(T) bool
 
 func (p Predicate[T]) F() func(T) bool {
@@ -14,17 +20,17 @@ func (p Predicate[T]) And(fns ...Predicate[T]) Predicate[T] {
 	return And(append([]Predicate[T]{p}, fns...)...)
 }
 
-func (p Predicate[T]) Negate() Predicate[T] {
+func (p Predicate[T]) Neg() Predicate[T] {
 	return func(v T) bool { return !p(v) }
 }
 
-func Equal[T comparable](rhs T) Predicate[T] {
+func Eq[T comparable](rhs T) Predicate[T] {
 	return func(lhs T) bool {
 		return lhs == rhs
 	}
 }
 
-func EqualAny[T comparable](rhs ...T) Predicate[T] {
+func EqAny[T comparable](rhs ...T) Predicate[T] {
 	return func(v T) bool {
 		for _, r := range rhs {
 			if v == r {
@@ -35,13 +41,13 @@ func EqualAny[T comparable](rhs ...T) Predicate[T] {
 	}
 }
 
-func NotEqual[T comparable](rhs T) Predicate[T] {
+func Neq[T comparable](rhs T) Predicate[T] {
 	return func(lhs T) bool {
 		return lhs != rhs
 	}
 }
 
-func NotEqualAll[T comparable](rhs ...T) Predicate[T] {
+func NeqAny[T comparable](rhs ...T) Predicate[T] {
 	return func(v T) bool {
 		for _, r := range rhs {
 			if v == r {
@@ -93,5 +99,57 @@ func Not[T any](fns ...Predicate[T]) Predicate[T] {
 			}
 		}
 		return true
+	}
+}
+
+func Greater[T constraints.Ordered](rhs T) Predicate[T] {
+	return func(v T) bool {
+		return v > rhs
+	}
+}
+
+func GreaterEq[T constraints.Ordered](rhs T) Predicate[T] {
+	return func(v T) bool {
+		return v >= rhs
+	}
+}
+
+func Less[T constraints.Ordered](rhs T) Predicate[T] {
+	return func(v T) bool {
+		return v < rhs
+	}
+}
+
+func LessEq[T constraints.Ordered](rhs T) Predicate[T] {
+	return func(v T) bool {
+		return v <= rhs
+	}
+}
+
+func Prefix(prefix string) Predicate[string] {
+	return func(v string) bool {
+		i := len(prefix)
+		return len(v) >= i && v[:i] == prefix
+	}
+}
+
+func Suffix(suffix string) Predicate[string] {
+	return func(v string) bool {
+		i := len(suffix)
+		return len(v) >= i && v[len(v)-i:] == suffix
+	}
+}
+
+func PrefixBytes(prefix []byte) Predicate[[]byte] {
+	return func(v []byte) bool {
+		i := len(prefix)
+		return len(v) >= i && bytes.Equal(v[:i], prefix)
+	}
+}
+
+func SuffixBytes(suffix []byte) Predicate[[]byte] {
+	return func(v []byte) bool {
+		i := len(suffix)
+		return len(v) >= i && bytes.Equal(v[len(v)-i:], suffix)
 	}
 }
