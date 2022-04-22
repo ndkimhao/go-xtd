@@ -5,10 +5,10 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/ndkimhao/go-xtd/xfn"
 	"github.com/ndkimhao/go-xtd/xtd"
 )
 
-type Predicate[T any] func(value T) bool
 type Transformer[T any] func(old T) (new T)
 type TypeTransformer[T any, R any] func(old T) (new R)
 type Consumer[T any] func(value T)
@@ -74,9 +74,9 @@ loop_src:
 	for v, hasNext := s.src.Next(); hasNext; v, hasNext = s.src.Next() {
 		for i, oAny := range s.ops {
 			switch op := oAny.(type) {
-			case Predicate[T]:
+			case xfn.Predicate[T]:
 				if !op(v) {
-					continue loop_src // Skip item because Predicate[T] returns false
+					continue loop_src // Skip item because xfn.Predicate[T] returns false
 				}
 			case predSkip:
 				if op > 0 {
@@ -117,7 +117,7 @@ func (s *Stream[T]) Map(transformer Transformer[T]) *Stream[T] {
 	return s
 }
 
-func (s *Stream[T]) Filter(predicate Predicate[T]) *Stream[T] {
+func (s *Stream[T]) Filter(predicate xfn.Predicate[T]) *Stream[T] {
 	s.hasPred = true
 	s.ops = append(s.ops, predicate)
 	return s
@@ -174,7 +174,7 @@ func (s *Stream[T]) Collect(consumer Consumer[T]) {
 	}
 }
 
-func (s *Stream[T]) All(predicate Predicate[T]) bool {
+func (s *Stream[T]) All(predicate xfn.Predicate[T]) bool {
 	for v, ok := s.Next(); ok; v, ok = s.Next() {
 		if !predicate(v) {
 			return false
@@ -183,7 +183,7 @@ func (s *Stream[T]) All(predicate Predicate[T]) bool {
 	return true
 }
 
-func (s *Stream[T]) Any(predicate Predicate[T]) bool {
+func (s *Stream[T]) Any(predicate xfn.Predicate[T]) bool {
 	for v, ok := s.Next(); ok; v, ok = s.Next() {
 		if predicate(v) {
 			return true
@@ -192,7 +192,7 @@ func (s *Stream[T]) Any(predicate Predicate[T]) bool {
 	return false
 }
 
-func (s *Stream[T]) None(predicate Predicate[T]) bool {
+func (s *Stream[T]) None(predicate xfn.Predicate[T]) bool {
 	return !s.Any(predicate)
 }
 
