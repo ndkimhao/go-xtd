@@ -24,7 +24,7 @@ func (s *sliceIter[T]) SkipNext(n int) (skipped int) {
 		panic("sliceIter.SkipNext: negative value")
 	}
 	sz := len(s.a)
-	if int64(s.i)+int64(n) >= int64(sz) {
+	if s.i+n >= sz { // TODO: handle overflow
 		rem := sz - s.i
 		s.i = sz
 		return rem

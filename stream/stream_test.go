@@ -1,6 +1,7 @@
 package stream_test
 
 import (
+	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -99,5 +100,12 @@ func TestStream_Map(t *testing.T) {
 			Take(2).
 			Slice()
 		assert.Equal(t, []int{40, 112}, r)
+	})
+}
+
+func TestMap(t *testing.T) {
+	t.Run("Simple", func(t *testing.T) {
+		r := stream.Map(stream.Range(0, 9, 3), strconv.Itoa).Slice()
+		assert.Equal(t, []string{"0", "3", "6", "9"}, r)
 	})
 }

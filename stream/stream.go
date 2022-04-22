@@ -39,7 +39,7 @@ func (tts *typeTransformerStream[T, R]) SkipNext(n int) (skipped int) {
 
 // use int to avoid allocation when storing in `ops []any`
 type predSkip int
-type predTake int
+type predLimit int
 
 type Stream[T any] struct {
 	_ xtd.NoCopy
@@ -69,18 +69,18 @@ loop_src:
 			switch op := oAny.(type) {
 			case Predicate[T]:
 				if !op(v) {
-					continue loop_src
+					continue loop_src // Skip item because Predicate[T] returns false
 				}
 			case predSkip:
 				if op > 0 {
 					s.ops[i] = op - 1
-					continue loop_src
+					continue loop_src // Skip item
 				}
-			case predTake:
+			case predLimit:
 				if op > 0 {
-					s.ops[i] = op - 1
+					s.ops[i] = op - 1 // Under limit, take item
 				} else {
-					continue loop_src
+					goto end_of_stream // Run out of limit, stop
 				}
 			case Transformer[T]:
 				v = op(v)
@@ -144,7 +144,7 @@ func (s *Stream[T]) Take(n int) *Stream[T] {
 		return s
 	}
 	s.hasPred = true
-	s.ops = append(s.ops, predTake(n))
+	s.ops = append(s.ops, predLimit(n))
 	return s
 }
 
