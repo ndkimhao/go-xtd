@@ -8,6 +8,9 @@ type Predicate[T any] func(value T) bool
 type Transformer[T any] func(old T) (new T)
 type TypeTransformer[T any, R any] func(old T) (new R)
 type Consumer[T any] func(value T)
+type Accumulator[A, T any] func(accum A, new T) A
+type Generator[T any] func() (value T)
+type BoundedGenerator[T any] func() (value T, ok bool)
 
 type Iterator[T any] interface {
 	// Next returns item from stream. When reaching end-of-stream,
@@ -84,6 +87,8 @@ loop_src:
 				}
 			case Transformer[T]:
 				v = op(v)
+			case Consumer[T]:
+				op(v)
 			default:
 				panic("Stream.Next: internal error: invalid op")
 			}
@@ -104,17 +109,11 @@ func (s *Stream[T]) SkipNext(n int) (skipped int) {
 // Intermediate operations
 
 func (s *Stream[T]) Map(transformer Transformer[T]) *Stream[T] {
-	if s.empty() {
-		return s
-	}
 	s.ops = append(s.ops, transformer)
 	return s
 }
 
 func (s *Stream[T]) Filter(predicate Predicate[T]) *Stream[T] {
-	if s.empty() {
-		return s
-	}
 	s.hasPred = true
 	s.ops = append(s.ops, predicate)
 	return s
@@ -124,7 +123,7 @@ func (s *Stream[T]) Skip(n int) *Stream[T] {
 	if n < 0 {
 		panic("Stream.Skip: negative value")
 	}
-	if s.empty() || n == 0 {
+	if n == 0 {
 		return s
 	}
 	if !s.hasPred {
@@ -136,15 +135,17 @@ func (s *Stream[T]) Skip(n int) *Stream[T] {
 	return s
 }
 
-func (s *Stream[T]) Take(n int) *Stream[T] {
+func (s *Stream[T]) Limit(n int) *Stream[T] {
 	if n < 0 {
-		panic("Stream.Take: negative value")
-	}
-	if s.empty() {
-		return s
+		panic("Stream.Limit: negative value")
 	}
 	s.hasPred = true
 	s.ops = append(s.ops, predLimit(n))
+	return s
+}
+
+func (s *Stream[T]) Peek(consumer Consumer[T]) *Stream[T] {
+	s.ops = append(s.ops, consumer)
 	return s
 }
 
@@ -163,7 +164,7 @@ func (s *Stream[T]) empty() bool {
 
 // Terminating operations
 
-func (s *Stream[T]) ForEach(consumer Consumer[T]) {
+func (s *Stream[T]) Collect(consumer Consumer[T]) {
 	for v, ok := s.Next(); ok; v, ok = s.Next() {
 		consumer(v)
 	}
@@ -187,6 +188,10 @@ func (s *Stream[T]) Any(predicate Predicate[T]) bool {
 	return false
 }
 
+func (s *Stream[T]) None(predicate Predicate[T]) bool {
+	return !s.Any(predicate)
+}
+
 func (s *Stream[T]) Count() int {
 	count := 0
 	for _, ok := s.Next(); ok; _, ok = s.Next() {
@@ -207,6 +212,22 @@ func (s *Stream[T]) Slice() []T {
 	var r []T
 	for v, ok := s.Next(); ok; v, ok = s.Next() {
 		r = append(r, v)
+	}
+	return r
+}
+
+func (s *Stream[T]) Reduce(identity T, accumulator Accumulator[T, T]) T {
+	r := identity
+	for v, ok := s.Next(); ok; v, ok = s.Next() {
+		r = accumulator(r, v)
+	}
+	return r
+}
+
+func Reduce[A, T any](s *Stream[T], identity A, accumulator Accumulator[A, T]) A {
+	r := identity
+	for v, ok := s.Next(); ok; v, ok = s.Next() {
+		r = accumulator(r, v)
 	}
 	return r
 }

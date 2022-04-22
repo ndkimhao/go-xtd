@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/mock"
 
 	"github.com/ndkimhao/go-xtd/stream"
+	"github.com/ndkimhao/go-xtd/vec"
 )
 
 type MockIterator[T any] struct {
@@ -25,7 +26,7 @@ func (m *MockIterator[T]) SkipNext(n int) (skipped int) {
 
 func TestNew(t *testing.T) {
 	assert.Equal(t, []int(nil), stream.New[int](nil).Slice())
-	assert.Equal(t, []int{1, 2, 3}, stream.From([]int{1, 2, 3}).Slice())
+	assert.Equal(t, []int{1, 2, 3}, stream.OfSlice([]int{1, 2, 3}).Slice())
 }
 
 func TestOf(t *testing.T) {
@@ -97,9 +98,24 @@ func TestStream_Map(t *testing.T) {
 			Map(func(x int) int { return x - 1 }).
 			Map(func(x int) int { return x / 2 }).
 			Skip(1).
-			Take(2).
+			Limit(2).
 			Slice()
 		assert.Equal(t, []int{40, 112}, r)
+	})
+}
+
+func TestStream_Peek(t *testing.T) {
+	t.Run("Simple", func(t *testing.T) {
+		a := vec.New[int]()
+		r := vec.New[int]()
+		stream.
+			Range(0, 9, 3).
+			Peek(a.PushBack).
+			Map(func(x int) int { return x * x }).
+			Peek(r.PushBack).
+			Collect(stream.VoidConsumer[int])
+		assert.Equal(t, []int{0, 3, 6, 9}, a.Slice())
+		assert.Equal(t, []int{0, 9, 36, 81}, r.Slice())
 	})
 }
 

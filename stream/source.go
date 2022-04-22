@@ -33,24 +33,17 @@ func (s *sliceIter[T]) SkipNext(n int) (skipped int) {
 	return n
 }
 
-func From[T any](slice []T) *Stream[T] {
-	return New[T](&sliceIter[T]{a: slice})
-}
-
-func Of[T any](values ...T) *Stream[T] {
-	return From(values)
-}
-
 // TODO: handle integer overflow/underflow
 type intIter[T constraints.Integer] struct {
 	start T
 	end   T
 	step  T
 	cur   T
+	inf   bool
 }
 
 func (i *intIter[T]) Next() (value T, ok bool) {
-	if (i.step > 0 && i.cur > i.end) || (i.step < 0 && i.cur < i.end) {
+	if !i.inf && ((i.step > 0 && i.cur > i.end) || (i.step < 0 && i.cur < i.end)) {
 		return 0, false
 	}
 	x := i.cur
@@ -72,9 +65,55 @@ func Range[T constraints.Integer](start, end, step T) *Stream[T] {
 		end:   end,
 		step:  step,
 		cur:   start,
+		inf:   false,
 	})
 }
 
 func RangeN[T constraints.Integer](n T) *Stream[T] {
 	return Range[T](0, n-1, 1)
+}
+
+func IntegerSequence[T constraints.Integer](start, step T) *Stream[T] {
+	if step == 0 {
+		panic("stream.IntegerSequence: step is 0")
+	}
+	return New[T](&intIter[T]{
+		start: start,
+		step:  step,
+		cur:   start,
+		inf:   true,
+	})
+}
+
+func (g Generator[T]) Next() (value T, ok bool) {
+	return g(), true
+}
+
+func (g Generator[T]) SkipNext(n int) (skipped int) {
+	for i := 0; i < n; i++ {
+		g()
+	}
+	return n
+}
+
+func (g BoundedGenerator[T]) Next() (value T, ok bool) {
+	return g()
+}
+
+func (g BoundedGenerator[T]) SkipNext(n int) (skipped int) {
+	for i := 0; i < n; i++ {
+		_, ok := g()
+		if !ok {
+			return i
+		}
+	}
+	return n
+}
+
+func Generate[T any](generator Generator[T]) *Stream[T] {
+	return New[T](generator)
+}
+
+func BoundedGenerate[T any](generator BoundedGenerator[T]) *Stream[T] {
+	return New[T](generator)
 }

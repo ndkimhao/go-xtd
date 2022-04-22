@@ -6,6 +6,10 @@ import (
 
 type Vector[T any] []T
 
+func New[T any]() Vector[T] {
+	return nil
+}
+
 func Of[T any](values ...T) Vector[T] {
 	return values
 }
