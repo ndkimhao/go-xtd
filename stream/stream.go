@@ -16,7 +16,7 @@ type Accumulator[A, T any] func(accum A, new T) A
 type Generator[T any] func() (value T)
 type BoundedGenerator[T any] func() (value T, ok bool)
 
-type Iterator[T any] interface {
+type Source[T any] interface {
 	// Next returns item from stream. When reaching end-of-stream,
 	// returns `value` is zero value of T and `ok` is false.
 	Next() (value T, ok bool)
@@ -51,20 +51,20 @@ type predLimit int
 type Stream[T any] struct {
 	_ xtd.NoCopy
 
-	src Iterator[T]
+	src Source[T]
 	ops []any
 	buf [8]any
 
 	hasPred bool
 }
 
-func New[T any](source Iterator[T]) *Stream[T] {
+func New[T any](source Source[T]) *Stream[T] {
 	s := &Stream[T]{src: source}
 	s.ops = s.buf[:0] // small slice optimization
 	return s
 }
 
-// Iterator interface
+// Source interface
 
 func (s *Stream[T]) Next() (value T, ok bool) {
 	if s.empty() {

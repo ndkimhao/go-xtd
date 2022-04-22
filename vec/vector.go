@@ -18,23 +18,46 @@ func OfSlice[T any](values []T) Vector[T] {
 	return values
 }
 
-func (v *Vector[T]) PushBack(value T) {
+func (v *Vector[T]) Append(value T) {
 	*v = append(*v, value)
 }
 
-func (v *Vector[T]) PushBackMany(values ...T) {
+func (v *Vector[T]) AppendMany(values ...T) {
 	*v = append(*v, values...)
 }
 
-func (v *Vector[T]) PopBack() (removedValue T) {
-	last := len(*v) - 1
-	val := (*v)[last]
-	*v = (*v)[:last]
-	return val
+func (v *Vector[T]) Delete(i int) {
+	s := *v
+	if i < len(s)-1 {
+		copy(s[i:], s[i+1:])
+	}
+	*v = s[:len(s)-1]
 }
 
-func (v Vector[T]) Size() int {
+func (v *Vector[T]) DeleteLast() {
+	s := *v
+	*v = s[:len(s)-1]
+}
+
+func (v *Vector[T]) UnorderedDelete(i int) {
+	s := *v
+	last := len(s) - 1
+	if i < last {
+		s[i], s[last] = s[last], s[i]
+	}
+	*v = s[:len(s)-1]
+}
+
+func (v Vector[T]) Len() int {
 	return len(v)
+}
+
+func (v Vector[T]) Cap() int {
+	return cap(v)
+}
+
+func (v Vector[T]) Sub(start, end int) Vector[T] {
+	return v[start:end]
 }
 
 func (v Vector[T]) Slice() []T {
@@ -48,10 +71,10 @@ func (v Vector[T]) At(n int) T {
 	return v[n]
 }
 
-func (v Vector[T]) Front() T {
+func (v Vector[T]) First() T {
 	return v[0]
 }
 
-func (v Vector[T]) Back() T {
+func (v Vector[T]) Last() T {
 	return v[len(v)-1]
 }

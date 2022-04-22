@@ -19,7 +19,7 @@ func TestOf(t *testing.T) {
 func TestVector_Zero(t *testing.T) {
 	var v vec.Vector[int]
 	assert.Equal(t, []int(nil), v.Slice())
-	assert.Equal(t, 0, v.Size())
+	assert.Equal(t, 0, v.Len())
 }
 
 func TestVector_ForRange(t *testing.T) {
@@ -28,38 +28,39 @@ func TestVector_ForRange(t *testing.T) {
 	}
 }
 
-func TestVector_Size(t *testing.T) {
-	assert.Equal(t, 0, vec.Of[int]().Size())
-	assert.Equal(t, 3, vec.Of(1, 2, 3).Size())
+func TestVector_Len(t *testing.T) {
+	assert.Equal(t, 0, vec.Of[int]().Len())
+	assert.Equal(t, 3, vec.Of(1, 2, 3).Len())
 }
 
-func TestVector_PushBack(t *testing.T) {
+func TestVector_Append(t *testing.T) {
 	var v vec.Vector[int]
 	x := []int{}
 	for i := 1; i < 100; i++ {
-		v.PushBack(i)
+		v.Append(i)
 		x = append(x, i)
 		assert.Equal(t, x, v.Slice())
 	}
 }
 
-func TestVector_PushBackMany(t *testing.T) {
+func TestVector_AppendMany(t *testing.T) {
 	var v vec.Vector[int]
 	x := []int{}
 	for i := 1; i < 100; i++ {
-		v.PushBackMany(i, i*2)
+		v.AppendMany(i, i*2)
 		x = append(x, i, i*2)
 		assert.Equal(t, x, v.Slice())
 	}
 }
 
-func TestVector_PopBack(t *testing.T) {
+func TestVector_EraseEnd(t *testing.T) {
 	var v vec.Vector[int]
 	for i := 1; i < 100; i++ {
-		v.PushBack(i)
+		v.Append(i)
 	}
 	for i := 99; i >= 1; i-- {
-		assert.Equal(t, i, v.PopBack())
+		assert.Equal(t, i, v.Last())
+		v.DeleteLast()
 	}
 }
 
@@ -92,15 +93,15 @@ func TestVector_At(t *testing.T) {
 }
 
 func TestVector_Front(t *testing.T) {
-	assert.Equal(t, 1, vec.Of(1, 2, 3).Front())
+	assert.Equal(t, 1, vec.Of(1, 2, 3).First())
 	assert.Panics(t, func() {
-		vec.Of[int]().Front()
+		vec.Of[int]().First()
 	})
 }
 
 func TestVector_Back(t *testing.T) {
-	assert.Equal(t, 3, vec.Of(1, 2, 3).Back())
+	assert.Equal(t, 3, vec.Of(1, 2, 3).Last())
 	assert.Panics(t, func() {
-		vec.Of[int]().Back()
+		vec.Of[int]().Last()
 	})
 }

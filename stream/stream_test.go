@@ -110,9 +110,9 @@ func TestStream_Peek(t *testing.T) {
 		r := vec.New[int]()
 		stream.
 			Range(0, 9, 3).
-			Peek(a.PushBack).
+			Peek(a.Append).
 			Map(func(x int) int { return x * x }).
-			Peek(r.PushBack).
+			Peek(r.Append).
 			Collect(stream.VoidConsumer[int])
 		assert.Equal(t, []int{0, 3, 6, 9}, a.Slice())
 		assert.Equal(t, []int{0, 9, 36, 81}, r.Slice())

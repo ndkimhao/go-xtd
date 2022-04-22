@@ -14,7 +14,7 @@ func TestGenerate(t *testing.T) {
 	t.Run("Simple", func(t *testing.T) {
 		s1 := rand.New(rand.NewSource(1))
 		v1 := vec.New[int]()
-		stream.Generate(s1.Int).Skip(5).Limit(10).Collect(v1.PushBack)
+		stream.Generate(s1.Int).Skip(5).Limit(10).Collect(v1.Append)
 
 		s2 := rand.New(rand.NewSource(1))
 		v2 := vec.New[int]()
@@ -22,7 +22,7 @@ func TestGenerate(t *testing.T) {
 			s2.Int()
 		}
 		for i := 0; i < 10; i++ {
-			v2.PushBack(s2.Int())
+			v2.Append(s2.Int())
 		}
 
 		assert.Equal(t, v2, v1)
