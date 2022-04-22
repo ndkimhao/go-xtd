@@ -6,8 +6,6 @@ import (
 	"github.com/ndkimhao/go-xtd/constraints"
 )
 
-type Predicate[T any] func(T) bool
-
 func (p Predicate[T]) F() func(T) bool {
 	return p
 }

@@ -12,7 +12,6 @@ import (
 type Transformer[T any] func(old T) (new T)
 type TypeTransformer[T any, R any] func(old T) (new R)
 type Consumer[T any] func(value T)
-type Accumulator[A, T any] func(accum A, new T) A
 type Generator[T any] func() (value T)
 type BoundedGenerator[T any] func() (value T, ok bool)
 
@@ -244,7 +243,7 @@ func (s *Stream[T]) Slice() []T {
 	return r
 }
 
-func (s *Stream[T]) Reduce(identity T, accumulator Accumulator[T, T]) T {
+func (s *Stream[T]) Reduce(identity T, accumulator xfn.BinaryOperator[T]) T {
 	r := identity
 	for v, ok := s.Next(); ok; v, ok = s.Next() {
 		r = accumulator(r, v)
@@ -270,7 +269,7 @@ func (s *Stream[T]) String() string {
 	return sb.String()
 }
 
-func Reduce[A, T any](s *Stream[T], identity A, accumulator Accumulator[A, T]) A {
+func Reduce[A, T any](s *Stream[T], identity A, accumulator xfn.BiFunction[A, T, A]) A {
 	r := identity
 	for v, ok := s.Next(); ok; v, ok = s.Next() {
 		r = accumulator(r, v)

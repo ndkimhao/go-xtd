@@ -48,3 +48,7 @@ type Complex interface {
 type Ordered interface {
 	Integer | Float | ~string
 }
+
+type Number interface {
+	Integer | Float
+}
