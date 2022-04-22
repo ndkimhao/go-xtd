@@ -9,8 +9,6 @@ import (
 	"github.com/ndkimhao/go-xtd/xtd"
 )
 
-type Transformer[T any] func(old T) (new T)
-type TypeTransformer[T any, R any] func(old T) (new R)
 type Consumer[T any] func(value T)
 type Generator[T any] func() (value T)
 type BoundedGenerator[T any] func() (value T, ok bool)
@@ -27,7 +25,7 @@ type Source[T any] interface {
 
 type typeTransformerStream[T any, R any] struct {
 	s *Stream[T]
-	t TypeTransformer[T, R]
+	t xfn.Function[T, R]
 }
 
 func (tts *typeTransformerStream[T, R]) Next() (value R, ok bool) {
@@ -88,7 +86,7 @@ loop_src:
 				} else {
 					goto end_of_stream // Run out of limit, stop
 				}
-			case Transformer[T]:
+			case xfn.UnaryOperator[T]:
 				v = op(v)
 			case Consumer[T]:
 				op(v)
@@ -111,7 +109,7 @@ func (s *Stream[T]) SkipNext(n int) (skipped int) {
 
 // Intermediate operations
 
-func (s *Stream[T]) Map(transformer Transformer[T]) *Stream[T] {
+func (s *Stream[T]) Map(transformer xfn.UnaryOperator[T]) *Stream[T] {
 	s.ops = append(s.ops, transformer)
 	return s
 }
@@ -152,7 +150,7 @@ func (s *Stream[T]) Peek(consumer Consumer[T]) *Stream[T] {
 	return s
 }
 
-func Map[R any, T any](s *Stream[T], transformer TypeTransformer[T, R]) *Stream[R] {
+func Map[R any, T any](s *Stream[T], transformer xfn.Function[T, R]) *Stream[R] {
 	return New[R](&typeTransformerStream[T, R]{s: s, t: transformer})
 }
 
@@ -165,27 +163,27 @@ func (s *Stream[T]) empty() bool {
 	return s.src == nil
 }
 
-func (s *Stream[T]) MapToInt(transformer TypeTransformer[T, int]) *Stream[int] {
+func (s *Stream[T]) MapToInt(transformer xfn.Function[T, int]) *Stream[int] {
 	return Map(s, transformer)
 }
 
-func (s *Stream[T]) MapToString(transformer TypeTransformer[T, string]) *Stream[string] {
+func (s *Stream[T]) MapToString(transformer xfn.Function[T, string]) *Stream[string] {
 	return Map(s, transformer)
 }
 
-func (s *Stream[T]) MapToBytes(transformer TypeTransformer[T, []byte]) *Stream[[]byte] {
+func (s *Stream[T]) MapToBytes(transformer xfn.Function[T, []byte]) *Stream[[]byte] {
 	return Map(s, transformer)
 }
 
-func (s *Stream[T]) MapToFloat(transformer TypeTransformer[T, float64]) *Stream[float64] {
+func (s *Stream[T]) MapToFloat(transformer xfn.Function[T, float64]) *Stream[float64] {
 	return Map(s, transformer)
 }
 
-func (s *Stream[T]) MapToBool(transformer TypeTransformer[T, bool]) *Stream[bool] {
+func (s *Stream[T]) MapToBool(transformer xfn.Function[T, bool]) *Stream[bool] {
 	return Map(s, transformer)
 }
 
-func (s *Stream[T]) MapToAny(transformer TypeTransformer[T, any]) *Stream[any] {
+func (s *Stream[T]) MapToAny(transformer xfn.Function[T, any]) *Stream[any] {
 	return Map(s, transformer)
 }
 

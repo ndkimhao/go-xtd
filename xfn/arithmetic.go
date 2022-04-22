@@ -34,26 +34,19 @@ func Mod[T constraints.Integer](rhs T) UnaryOperator[T] {
 	}
 }
 
-func Plus2[T constraints.Ordered](lhs, rhs T) BinaryOperator[T] {
-	return func(lsh, rhs T) T {
-		return lsh + rhs
-	}
+func Plus2[T constraints.Ordered](lhs, rhs T) T {
+	return lhs + rhs
 }
 
-func Mult2[T constraints.Number](lhs, rhs T) BinaryOperator[T] {
-	return func(lsh, rhs T) T {
-		return lsh * rhs
-	}
+func Mult2[T constraints.Number](lhs, rhs T) T {
+	return lhs * rhs
 }
 
-func Div2[T constraints.Number](lhs, rhs T) BinaryOperator[T] {
-	return func(lsh, rhs T) T {
-		return lsh / rhs
-	}
+func Div2[T constraints.Number](lhs, rhs T) T {
+	return lhs / rhs
+
 }
 
-func Mod2[T constraints.Integer](lhs, rhs T) BinaryOperator[T] {
-	return func(lsh, rhs T) T {
-		return lsh % rhs
-	}
+func Mod2[T constraints.Integer](lhs, rhs T) T {
+	return lhs % rhs
 }
