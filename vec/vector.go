@@ -45,7 +45,7 @@ func (v *Vector[T]) UnorderedDelete(i int) {
 	if i < last {
 		s[i], s[last] = s[last], s[i]
 	}
-	*v = s[:len(s)-1]
+	*v = s[:last]
 }
 
 func (v Vector[T]) Len() int {

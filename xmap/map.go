@@ -1,8 +1,12 @@
 package xmap
 
-type Entry[K comparable, V any] struct {
+type Entry[K any, V any] struct {
 	Key   K
 	Value V
+}
+
+func NewEntry[K, V any](key K, value V) Entry[K, V] {
+	return Entry[K, V]{Key: key, Value: value}
 }
 
 type Map[K comparable, V any] map[K]V

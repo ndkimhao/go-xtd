@@ -19,6 +19,6 @@ func TestPlus(t *testing.T) {
 func TestPlus2(t *testing.T) {
 	t.Run("Int", func(t *testing.T) {
 		assert.Equal(t, 12,
-			stream.RangeN(3).Map(xfn.Plus(1)).Map(xfn.Mult(2)).Reduce(0, xfn.Plus2[int]))
+			stream.RangeN(3).Map(xfn.Plus(1)).Map(xfn.Mult(2)).Reduce(0, xfn.PlusOp[int]))
 	})
 }

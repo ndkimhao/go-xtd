@@ -151,3 +151,27 @@ func SuffixBytes(suffix []byte) Predicate[[]byte] {
 		return len(v) >= i && bytes.Equal(v[len(v)-i:], suffix)
 	}
 }
+
+func EqOp[T comparable](lhs, rhs T) bool {
+	return lhs == rhs
+}
+
+func NeqEqOp[T comparable](lhs, rhs T) bool {
+	return lhs != rhs
+}
+
+func GreaterOp[T constraints.Ordered](lhs, rhs T) bool {
+	return lhs > rhs
+}
+
+func GreaterEqOp[T constraints.Ordered](lhs, rhs T) bool {
+	return lhs >= rhs
+}
+
+func LessOp[T constraints.Ordered](lhs, rhs T) bool {
+	return lhs < rhs
+}
+
+func LessEqOp[T constraints.Ordered](lhs, rhs T) bool {
+	return lhs <= rhs
+}
