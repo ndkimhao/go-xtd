@@ -30,7 +30,7 @@ func BenchmarkMath_Uint64(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		v += math_rand.Uint64()
 	}
-	runtime.KeepAlive(v)
+	runtime.KeepAlive(&v)
 }
 
 func BenchmarkMathLocal_Uint64(b *testing.B) {
@@ -39,7 +39,7 @@ func BenchmarkMathLocal_Uint64(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		v += rng.Uint64()
 	}
-	runtime.KeepAlive(v)
+	runtime.KeepAlive(&v)
 }
 
 func BenchmarkCrypto_Uint64(b *testing.B) {
@@ -49,7 +49,7 @@ func BenchmarkCrypto_Uint64(b *testing.B) {
 		_, _ = cryto_rand.Read(b[:])
 		v += binary.LittleEndian.Uint64(b[:])
 	}
-	runtime.KeepAlive(v)
+	runtime.KeepAlive(&v)
 }
 
 func BenchmarkFRand_Uint64(b *testing.B) {
@@ -58,7 +58,7 @@ func BenchmarkFRand_Uint64(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		v += rng.Uint64()
 	}
-	runtime.KeepAlive(v)
+	runtime.KeepAlive(&v)
 }
 
 func BenchmarkMath_1M(b *testing.B) {
