@@ -1,21 +1,12 @@
 package hasher
 
 import (
-	crypto_rand "crypto/rand"
-	"encoding/binary"
 	"unsafe"
+
+	"github.com/ndkimhao/go-xtd/xrand"
 )
 
-var defaultSeed uintptr
-
-func init() {
-	var b [8]byte
-	_, err := crypto_rand.Read(b[:])
-	if err != nil {
-		panic("cannot read from crypto/rand.Read")
-	}
-	defaultSeed = uintptr(binary.LittleEndian.Uint64(b[:]))
-}
+var defaultSeed = uintptr(xrand.Crypto().Uint64())
 
 // Based on https://mdlayher.com/blog/go-generics-draft-design-building-a-hashtable/
 
