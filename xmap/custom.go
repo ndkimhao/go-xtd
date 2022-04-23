@@ -5,15 +5,15 @@ import (
 	"github.com/ndkimhao/go-xtd/xfn"
 )
 
-type CustomKey[K, V any] struct {
+type Custom[K, V any] struct {
 	main  map[uint64]Entry[K, V]
 	ovf   map[uint64][]Entry[K, V]
 	hash  func(K) uint64
 	equal func(K, K) bool
 }
 
-func NewCustomKeyMap[K, V any](hasher xfn.Function[K, uint64], comparator xfn.BiPredicate[K, K]) CustomKey[K, V] {
-	return CustomKey[K, V]{
+func NewCustom[K, V any](hasher xfn.Function[K, uint64], comparator xfn.BiPredicate[K, K]) Custom[K, V] {
+	return Custom[K, V]{
 		main:  map[uint64]Entry[K, V]{},
 		ovf:   nil,
 		hash:  hasher,
@@ -21,7 +21,7 @@ func NewCustomKeyMap[K, V any](hasher xfn.Function[K, uint64], comparator xfn.Bi
 	}
 }
 
-func (m CustomKey[K, V]) Get(key K) (value V, ok bool) {
+func (m Custom[K, V]) Get(key K) (value V, ok bool) {
 	hash := m.hash(key)
 	main, foundMain := m.main[hash]
 	if !foundMain {
@@ -42,7 +42,7 @@ func (m CustomKey[K, V]) Get(key K) (value V, ok bool) {
 	return main.Value, false // not found in overflow too
 }
 
-func (m CustomKey[K, V]) Set(key K, value V) (added bool) {
+func (m Custom[K, V]) Set(key K, value V) (added bool) {
 	hash := m.hash(key)
 	mainEntry, foundMain := m.main[hash]
 	if !foundMain || m.equal(mainEntry.Key, key) {
@@ -67,7 +67,7 @@ func (m CustomKey[K, V]) Set(key K, value V) (added bool) {
 	return true // add new entry to overflow
 }
 
-func (m CustomKey[K, V]) Delete(key K) (ok bool) {
+func (m Custom[K, V]) Delete(key K) (ok bool) {
 	hash := m.hash(key)
 	main, foundMain := m.main[hash]
 	if !foundMain {
