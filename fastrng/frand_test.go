@@ -33,6 +33,15 @@ func BenchmarkMath_Uint64(b *testing.B) {
 	runtime.KeepAlive(v)
 }
 
+func BenchmarkMathLocal_Uint64(b *testing.B) {
+	rng := math_rand.NewSource(1).(math_rand.Source64)
+	v := uint64(0)
+	for i := 0; i < b.N; i++ {
+		v += rng.Uint64()
+	}
+	runtime.KeepAlive(v)
+}
+
 func BenchmarkCrypto_Uint64(b *testing.B) {
 	v := uint64(0)
 	for i := 0; i < b.N; i++ {
@@ -58,6 +67,16 @@ func BenchmarkMath_1M(b *testing.B) {
 	buf := make([]byte, sz)
 	for i := 0; i < b.N; i++ {
 		math_rand.Read(buf)
+	}
+}
+
+func BenchmarkMathLocal_1M(b *testing.B) {
+	rng := math_rand.New(math_rand.NewSource(1))
+	sz := int64(1 << 20)
+	b.SetBytes(sz)
+	buf := make([]byte, sz)
+	for i := 0; i < b.N; i++ {
+		rng.Read(buf)
 	}
 }
 
