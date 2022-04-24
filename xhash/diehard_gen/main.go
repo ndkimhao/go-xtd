@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	modeFast64     = flag.Bool("fast64", false, "Use xhash.Fast64, WriteUint64(0)")
+	modeFast64     = flag.Bool("incr64", false, "Use xhash.Incremental64, WriteUint64(0)")
 	modeUint64     = flag.Bool("uint64", false, "Use xhash.Uint64(i)")
 	modeUint64Seed = flag.Bool("uint64_seed", false, "Use xhash.Uint64Seed(0, i)")
 )

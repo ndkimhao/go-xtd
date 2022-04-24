@@ -4,7 +4,7 @@ import (
 	"math/bits"
 )
 
-type Fast64 struct {
+type Incremental64 struct {
 	h uint64
 }
 
@@ -14,8 +14,8 @@ const (
 	key64_016 uint64 = 0xdb979083e96dd4de
 )
 
-func NewFast64() Fast64 {
-	return Fast64{h: key64_000}
+func NewFast64() Incremental64 {
+	return Incremental64{h: key64_000}
 }
 
 func rrmxmx(h64 uint64) uint64 {
@@ -39,11 +39,11 @@ func Uint64Seed(v uint64, seed uint64) uint64 {
 	return rrmxmx(keyed)
 }
 
-func (f *Fast64) WriteUint64(v uint64) {
+func (f *Incremental64) WriteUint64(v uint64) {
 	f.h = Uint64Seed(v, f.h)
 }
 
-func (f *Fast64) Write(p []byte) (n int, err error) {
+func (f *Incremental64) Write(p []byte) (n int, err error) {
 	i := 0
 	f.WriteUint64(uint64(len(p)))
 	for ; i < len(p); i += 8 {
@@ -57,24 +57,24 @@ func (f *Fast64) Write(p []byte) (n int, err error) {
 	return i, nil
 }
 
-func (f *Fast64) Sum(b []byte) []byte {
+func (f *Incremental64) Sum(b []byte) []byte {
 	var a [8]byte
 	putUint64(a[:], f.Sum64())
 	return append(b, a[:]...)
 }
 
-func (f *Fast64) Reset() {
+func (f *Incremental64) Reset() {
 	*f = NewFast64()
 }
 
-func (f *Fast64) Size() int {
+func (f *Incremental64) Size() int {
 	return 8
 }
 
-func (f *Fast64) BlockSize() int {
+func (f *Incremental64) BlockSize() int {
 	return 8
 }
 
-func (f *Fast64) Sum64() uint64 {
+func (f *Incremental64) Sum64() uint64 {
 	return Uint64(f.h)
 }
