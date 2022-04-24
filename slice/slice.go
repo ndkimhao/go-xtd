@@ -70,12 +70,24 @@ func (s Slice[T]) Last() T {
 	return s[len(s)-1]
 }
 
+func (s Slice[T]) IteratorAt(pos int) Iterator[T] {
+	slen := s.Len()
+	if pos < 0 || slen < pos {
+		panic("out of bound")
+	}
+	var beg *T
+	if slen > 0 {
+		beg = &s[0]
+	}
+	return Iterator[T]{pos: pos, len: slen, beg: beg}
+}
+
 func (s Slice[T]) Begin() Iterator[T] {
-	return Iterator[T]{s: s, p: 0}
+	return s.IteratorAt(0)
 }
 
 func (s Slice[T]) End() Iterator[T] {
-	return Iterator[T]{s: s, p: s.Len()}
+	return s.IteratorAt(s.Len())
 }
 
 func (s Slice[T]) RBegin() iter.ReverseRandom[T, Iterator[T]] {
@@ -84,4 +96,16 @@ func (s Slice[T]) RBegin() iter.ReverseRandom[T, Iterator[T]] {
 
 func (s Slice[T]) REnd() iter.ReverseRandom[T, Iterator[T]] {
 	return iter.ReverseRandomIterator[T](s.Begin())
+}
+
+func (s Slice[T]) Reversed() Slice[T] {
+	if len(s) == 0 {
+		return nil
+	}
+	r := make([]T, len(s))
+	last := len(s) - 1
+	for i, v := range s {
+		r[last-i] = v
+	}
+	return r
 }

@@ -1,6 +1,8 @@
 package slice
 
 import (
+	"unsafe"
+
 	"github.com/ndkimhao/go-xtd/iter"
 	"github.com/ndkimhao/go-xtd/xtd"
 )
@@ -12,47 +14,59 @@ var _ iter.RandomIterator[int, Iterator[int]] = Iterator[int]{}
 type Iterator[T any] struct {
 	_ xtd.NoCompare
 
-	s Slice[T]
-	p int
+	pos int
+	len int
+	beg *T
+}
+
+func (iter Iterator[T]) Ref() *T {
+	if iter.pos < 0 || iter.len <= iter.pos {
+		panic("ref out of bound")
+	}
+	return (*T)(unsafe.Add(unsafe.Pointer((*T)(iter.beg)), uintptr(iter.pos)*unsafe.Sizeof(*(*T)(nil))))
 }
 
 func (iter Iterator[T]) Value() T {
-	return iter.s.At(iter.p)
+	return *iter.Ref()
 }
 
 func (iter Iterator[T]) SetValue(val T) {
-	iter.s.Set(iter.p, val)
+	*iter.Ref() = val
+}
+
+func (iter Iterator[T]) addUnchecked(offset int) Iterator[T] {
+	return Iterator[T]{pos: iter.pos + offset, len: iter.len, beg: iter.beg}
 }
 
 func (iter Iterator[T]) Next() Iterator[T] {
-	if iter.p >= iter.s.Len() {
-		panic("increase past end of slice")
+	if iter.pos >= iter.len {
+		panic("next is out of bound")
 	}
-	return Iterator[T]{s: iter.s, p: iter.p + 1}
+	return iter.addUnchecked(1)
 }
 
 func (iter Iterator[T]) Prev() Iterator[T] {
-	if iter.p <= 0 {
-		panic("decrease past start of slice")
+	if iter.pos <= 0 {
+		panic("prev is out of bound")
 	}
-	return Iterator[T]{s: iter.s, p: iter.p - 1}
+	return iter.addUnchecked(-1)
 }
 
 func (iter Iterator[T]) Add(offset int) Iterator[T] {
-	k := iter.p + offset
-	if k < 0 && iter.s.Len() < k {
+	k := iter.pos + offset
+	if k < 0 || iter.len < k {
 		panic("add out of bound")
 	}
-	return Iterator[T]{s: iter.s, p: k}
+	return iter.addUnchecked(offset)
 }
 
 func (iter Iterator[T]) Position() int {
-	return iter.p
+	return iter.pos
 }
 
 func (iter Iterator[T]) Equal(other Iterator[T]) bool {
-	if !ReferenceEqual(iter.s, other.s) {
+	if iter.beg != other.beg {
 		panic("compare iterator of different slices")
 	}
-	return other.p == iter.p
+	return other.pos == iter.pos
 }
