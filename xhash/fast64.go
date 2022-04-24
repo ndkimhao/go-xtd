@@ -12,8 +12,6 @@ const (
 	key64_000 uint64 = 0xbe4ba423396cfeb8
 	key64_008 uint64 = 0x1cad21f72c81017c
 	key64_016 uint64 = 0xdb979083e96dd4de
-	key64_024 uint64 = 0x1f67b3b7a4a44072
-	key64_032 uint64 = 0x78e5c0cc4ee679cb
 )
 
 func NewFast64() Fast64 {
@@ -29,9 +27,18 @@ func rrmxmx(h64 uint64, len uint64) uint64 {
 	return h64
 }
 
-func (f *Fast64) WriteUint64(v uint64) {
+func Uint64(v uint64) uint64 {
 	keyed := v ^ (key64_008 ^ key64_016)
-	f.h = rrmxmx(keyed, f.h)
+	return rrmxmx(keyed, 8)
+}
+
+func Uint64Seed(v uint64, seed uint64) uint64 {
+	keyed := v ^ (key64_008 ^ key64_016)
+	return rrmxmx(keyed, seed)
+}
+
+func (f *Fast64) WriteUint64(v uint64) {
+	f.h = Uint64Seed(v, f.h)
 }
 
 func (f *Fast64) Write(p []byte) (n int, err error) {
@@ -67,6 +74,5 @@ func (f *Fast64) BlockSize() int {
 }
 
 func (f *Fast64) Sum64() uint64 {
-	keyed := f.h ^ (key64_024 ^ key64_032)
-	return rrmxmx(keyed, 8)
+	return Uint64(f.h)
 }
