@@ -5,7 +5,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/ndkimhao/go-xtd/fastrng"
+	"github.com/ndkimhao/go-xtd/secrand"
 )
 
 func main() {
@@ -20,7 +20,7 @@ func main() {
 	raw := len(os.Args) >= 3 && os.Args[2] == "-raw"
 	var seed32 [32]byte
 	binary.LittleEndian.PutUint64(seed32[:], uint64(seed))
-	rng := fastrng.New(seed32)
+	rng := secrand.NewRNGFromSeed(seed32)
 	var buf [499]byte
 	var ibuf [8]byte
 	for {
