@@ -26,7 +26,7 @@ func NewFast64() Fast64 {
 }
 
 func (f *Fast64) WriteUint64(v uint64) {
-	f.mix = mix64(f.mix^v) ^ f.mix
+	f.mix = mix64(f.mix ^ v)
 }
 
 func (f *Fast64) Write(p []byte) (n int, err error) {
