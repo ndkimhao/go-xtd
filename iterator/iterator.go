@@ -3,59 +3,59 @@ package iterator
 // ConstIterator is an interface of const iterator
 type ConstIterator[T any] interface {
 	IsValid() bool
-	Next() ConstIterator
+	Next() ConstIterator[T]
 	Value() T
-	Clone() ConstIterator
-	Equal(other ConstIterator) bool
+	Clone() ConstIterator[T]
+	Equal(other ConstIterator[T]) bool
 }
 
 // Iterator is an interface of mutable iterator
 type Iterator[T any] interface {
-	ConstIterator
+	ConstIterator[T]
 	SetValue(value T)
 }
 
 // ConstKvIterator is an interface of const key-value type iterator
 type ConstKvIterator[T any] interface {
-	ConstIterator
+	ConstIterator[T]
 	Key() T
 }
 
 // KvIterator is an interface of mutable key-value type iterator
 type KvIterator[T any] interface {
-	ConstKvIterator
+	ConstKvIterator[T]
 	SetValue(value T)
 }
 
 // ConstBidIterator is an interface of const bidirectional iterator
 type ConstBidIterator[T any] interface {
-	ConstIterator
-	Prev() ConstBidIterator
+	ConstIterator[T]
+	Prev() ConstBidIterator[T]
 }
 
 // BidIterator is an interface of mutable bidirectional iterator
 type BidIterator[T any] interface {
-	ConstBidIterator
+	ConstBidIterator[T]
 	SetValue(value T)
 }
 
 // ConstKvBidIterator is an interface of const key-value type bidirectional iterator
 type ConstKvBidIterator[T any] interface {
-	ConstKvIterator
-	Prev() ConstBidIterator
+	ConstKvIterator[T]
+	Prev() ConstBidIterator[T]
 }
 
 // KvBidIterator is an interface of mutable key-value type bidirectional iterator
 type KvBidIterator[T any] interface {
-	ConstKvIterator
-	Prev() ConstBidIterator
+	ConstKvIterator[T]
+	Prev() ConstBidIterator[T]
 	SetValue(value T)
 }
 
 // RandomAccessIterator is an interface of mutable random access iterator
 type RandomAccessIterator[T any] interface {
-	BidIterator
+	BidIterator[T]
 	//IteratorAt returns a new iterator at position
-	IteratorAt(position int) RandomAccessIterator
+	IteratorAt(position int) RandomAccessIterator[T]
 	Position() int
 }
