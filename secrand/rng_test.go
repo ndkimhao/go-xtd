@@ -2,6 +2,8 @@ package secrand_test
 
 import (
 	"math"
+	math_rand "math/rand"
+	"runtime"
 	"testing"
 
 	"github.com/ndkimhao/go-xtd/secrand"
@@ -37,4 +39,31 @@ func TestRNG_Uint64_print(t *testing.T) {
 			t.Log(rng.Uint64())
 		}
 	})
+}
+
+func BenchmarkRNG_Uint64(b *testing.B) {
+	var seed [32]byte
+	var nonce [8]byte
+	var rng *secrand.RNG
+	f := func(b *testing.B) {
+		v := uint64(0)
+		for i := 0; i < b.N; i++ {
+			v += rng.Uint64()
+		}
+		runtime.KeepAlive(&v)
+	}
+
+	rng = secrand.NewRNGFromSeed(seed)
+	b.Run("1k buffer", f)
+	rng = secrand.NewRNGCustom(seed, nonce, 128<<10, 12)
+	b.Run("128k buffer", f)
+}
+
+func BenchmarkMathRand_Uint64(b *testing.B) {
+	rng := math_rand.New(math_rand.NewSource(0))
+	v := uint64(0)
+	for i := 0; i < b.N; i++ {
+		v += rng.Uint64()
+	}
+	runtime.KeepAlive(&v)
 }
