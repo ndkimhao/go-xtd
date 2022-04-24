@@ -67,11 +67,11 @@ func (s Slice[T]) Last() T {
 }
 
 // Begin returns the first iterator of s
-func (s Slice[T]) Begin() *Iterator[T] {
-	return &Iterator[T]{s: s, p: 0}
+func (s Slice[T]) Begin() Iterator[T] {
+	return Iterator[T]{s: s, p: 0}
 }
 
 // End returns the end iterator of s
-func (s Slice[T]) End() *Iterator[T] {
-	return &Iterator[T]{s: s, p: s.Len()}
+func (s Slice[T]) End() Iterator[T] {
+	return Iterator[T]{s: s, p: s.Len()}
 }
