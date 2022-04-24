@@ -16,6 +16,7 @@ var (
 )
 
 func main() {
+	flag.Parse()
 	h := xhash.NewFast64()
 	w := bufio.NewWriter(os.Stdout)
 	var b [8]byte
