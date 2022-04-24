@@ -28,3 +28,19 @@ func TestIsSortedUntil(t *testing.T) {
 		assert.True(t, it.Equal(s.End()))
 	})
 }
+
+func TestIsSorted(t *testing.T) {
+	s := slice.Of[int]()
+	assert.True(t, algo.IsSorted[int](s.Begin(), s.End()))
+	s = slice.Of(1)
+	assert.True(t, algo.IsSorted[int](s.Begin(), s.End()))
+	s = slice.Of(1, 2)
+	assert.True(t, algo.IsSorted[int](s.Begin(), s.End()))
+	s = slice.Of(1, 2, 3, 3, 3, 5)
+	assert.True(t, algo.IsSorted[int](s.Begin(), s.End()))
+
+	s = slice.Of(1, 2, 3, 2, 3)
+	assert.False(t, algo.IsSorted[int](s.Begin(), s.End()))
+	s = slice.Of(2, 2, 2, 1)
+	assert.False(t, algo.IsSorted[int](s.Begin(), s.End()))
+}

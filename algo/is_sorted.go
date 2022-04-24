@@ -7,10 +7,10 @@ import (
 )
 
 func IsSortedUntil[T constraints.Ordered, It iter.ConstIterator[T, It]](first, last It) It {
-	return IsSortedUntilCustom[T, It](first, last, xfn.LessComparatorOf[T])
+	return IsSortedUntilComp[T, It](first, last, xfn.LessComparatorOf[T])
 }
 
-func IsSortedUntilCustom[T any, It iter.ConstIterator[T, It]](first, last It, comp xfn.LessComparator[T]) It {
+func IsSortedUntilComp[T any, It iter.ConstIterator[T, It]](first, last It, comp xfn.LessComparator[T]) It {
 	if !first.Equal(last) {
 		next := first.Next()
 		for !next.Equal(last) {
@@ -22,4 +22,12 @@ func IsSortedUntilCustom[T any, It iter.ConstIterator[T, It]](first, last It, co
 		}
 	}
 	return last
+}
+
+func IsSorted[T constraints.Ordered, It iter.ConstIterator[T, It]](first, last It) bool {
+	return IsSortedUntilComp(first, last, xfn.LessComparatorOf[T]).Equal(last)
+}
+
+func IsSortedComp[T any, It iter.ConstIterator[T, It]](first, last It, comp xfn.LessComparator[T]) bool {
+	return IsSortedUntilComp(first, last, comp).Equal(last)
 }

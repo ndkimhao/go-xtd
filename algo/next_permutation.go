@@ -13,7 +13,7 @@ func NextPermutation[T constraints.Ordered, It iter.RandomIterator[T, It]](first
 func NextPermutationComp[T any, It iter.RandomIterator[T, It]](first, last It, comp xfn.LessComparator[T]) bool {
 	rFirst := iter.ReverseRandomIterator[T](last)
 	rLast := iter.ReverseRandomIterator[T](first)
-	left := IsSortedUntilCustom(rFirst, rLast, comp)
+	left := IsSortedUntilComp(rFirst, rLast, comp)
 	if !left.Equal(rLast) {
 		right := UpperBoundComp[T](rFirst, left, left.Value(), comp)
 		Swap[T](left, right)
