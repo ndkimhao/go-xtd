@@ -1,7 +1,7 @@
 package stream
 
 import (
-	"github.com/ndkimhao/go-xtd/vec"
+	"github.com/ndkimhao/go-xtd/slice"
 	"github.com/ndkimhao/go-xtd/xmap"
 )
 
@@ -13,7 +13,7 @@ func Of[T any](values ...T) *Stream[T] {
 	return OfSlice(values)
 }
 
-func OfVec[T any](v vec.Vector[T]) *Stream[T] {
+func OfVec[T any](v slice.Slice[T]) *Stream[T] {
 	return OfSlice(v.Slice())
 }
 
