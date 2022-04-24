@@ -86,6 +86,7 @@ func TestFast64_Reset(t *testing.T) {
 }
 
 func BenchmarkFast64_Write(b *testing.B) {
+	b.ReportAllocs()
 	sz := int64(4 << 10)
 	b.SetBytes(sz)
 	buf := make([]byte, sz)
@@ -97,6 +98,7 @@ func BenchmarkFast64_Write(b *testing.B) {
 }
 
 func BenchmarkFast64_WriteUint64(b *testing.B) {
+	b.ReportAllocs()
 	h := xhash.NewFast64()
 	for i := 0; i < b.N; i++ {
 		h.WriteUint64(uint64(i))
@@ -105,9 +107,21 @@ func BenchmarkFast64_WriteUint64(b *testing.B) {
 }
 
 func BenchmarkFast64_Sum64(b *testing.B) {
+	b.ReportAllocs()
 	h := xhash.NewFast64()
 	v := uint64(0)
 	for i := 0; i < b.N; i++ {
+		v += h.Sum64()
+	}
+	runtime.KeepAlive(v)
+}
+
+func BenchmarkFast64(b *testing.B) {
+	b.ReportAllocs()
+	v := uint64(0)
+	for i := 0; i < b.N; i++ {
+		h := xhash.NewFast64()
+		h.WriteUint64(uint64(i))
 		v += h.Sum64()
 	}
 	runtime.KeepAlive(v)
