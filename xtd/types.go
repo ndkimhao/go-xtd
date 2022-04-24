@@ -1,7 +1,7 @@
 package xtd
 
 type Comparable[T any] interface {
-	Equals(other T) bool
+	Equal(other T) bool
 }
 
 type Ordered[T any] interface {
