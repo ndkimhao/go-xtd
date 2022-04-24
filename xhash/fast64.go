@@ -9,7 +9,6 @@ type Fast64 struct {
 }
 
 const (
-	prime64   uint64 = 0x9fb21c651e98df25
 	key64_000 uint64 = 0xbe4ba423396cfeb8
 	key64_008 uint64 = 0x1cad21f72c81017c
 	key64_016 uint64 = 0xdb979083e96dd4de
@@ -19,29 +18,25 @@ func NewFast64() Fast64 {
 	return Fast64{h: key64_000}
 }
 
-func Uint64(v uint64) uint64 {
-	h64 := v ^ (key64_008 ^ key64_016)
+func rrmxmx(h64 uint64) uint64 {
 	h64 ^= bits.RotateLeft64(h64, 49) ^ bits.RotateLeft64(h64, 24)
-	h64 *= prime64
+	h64 *= 0x9fb21c651e98df25
 	h64 ^= (h64 >> 35) + 8
-	h64 *= prime64
+	h64 *= 0x9fb21c651e98df25
 	h64 ^= h64 >> 28
-	h64 *= prime64
-	h64 ^= h64 >> 32
 	return h64
+}
+
+func Uint64(v uint64) uint64 {
+	keyed := v ^ (key64_008 ^ key64_016)
+	return rrmxmx(keyed)
 }
 
 // Uint64Seed seed should be random (e.g., precompute seed by hashing it first)
 func Uint64Seed(v uint64, seed uint64) uint64 {
-	h64 := v ^ (key64_008 ^ key64_016)
-	h64 ^= bits.RotateLeft64(h64, 49) ^ bits.RotateLeft64(h64, 24)
-	h64 *= prime64
-	h64 ^= (h64 >> 35) + seed
-	h64 *= prime64
-	h64 ^= h64 >> 28
-	h64 *= prime64
-	h64 ^= h64 >> 32
-	return h64
+	seed ^= uint64(bits.ReverseBytes32(uint32(seed))) << 32
+	keyed := v ^ (key64_008 ^ key64_016 - seed)
+	return rrmxmx(keyed)
 }
 
 func (f *Fast64) WriteUint64(v uint64) {

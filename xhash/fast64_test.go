@@ -1,6 +1,7 @@
 package xhash_test
 
 import (
+	"encoding/binary"
 	"math"
 	"math/bits"
 	"math/rand"
@@ -8,6 +9,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"github.com/zeebo/xxh3"
 
 	"github.com/ndkimhao/go-xtd/xhash"
 	"github.com/ndkimhao/go-xtd/xmap"
@@ -54,6 +57,48 @@ func TestFast64_Sticky(t *testing.T) {
 	t.Run("Max", func(t *testing.T) {
 		_testSticky(t, func() uint64 { return math.MaxUint64 })
 	})
+}
+
+func TestUint64(t *testing.T) {
+	var b [8]byte
+	check := func(v uint64) {
+		binary.LittleEndian.PutUint32(b[0:4], uint32(v>>32))
+		binary.LittleEndian.PutUint32(b[4:8], uint32(v))
+		expected := xxh3.Hash(b[:])
+		actual := xhash.Uint64(v)
+		require.Equalf(t, expected, actual, "v=%d", v)
+	}
+	check(0)
+	check(1)
+	rng := rand.NewSource(1).(rand.Source64)
+	for i := uint64(0); i < 1000; i++ {
+		check(i)
+		check(math.MaxUint64 - i)
+		check(rng.Uint64())
+	}
+}
+
+func TestUint64Seed(t *testing.T) {
+	var b [8]byte
+	check := func(v, seed uint64) {
+		binary.LittleEndian.PutUint32(b[0:4], uint32(v>>32))
+		binary.LittleEndian.PutUint32(b[4:8], uint32(v))
+		expected := xxh3.HashSeed(b[:], seed)
+		actual := xhash.Uint64Seed(v, seed)
+		require.Equalf(t, expected, actual, "v=%d seed=%d", v, seed)
+	}
+	check(0, 0)
+	check(1, 0)
+	check(0, 1)
+	rng := rand.NewSource(1).(rand.Source64)
+	for i := uint64(0); i < 1000; i++ {
+		check(i, 0)
+		check(math.MaxUint64-i, 0)
+		check(rng.Uint64(), 0)
+		check(i, rng.Uint64())
+		check(math.MaxUint64-i, rng.Uint64())
+		check(rng.Uint64(), rng.Uint64())
+	}
 }
 
 func TestFast64_Write(t *testing.T) {
