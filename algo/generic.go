@@ -6,10 +6,12 @@ import (
 
 // Swap swaps the value of two iterator
 func Swap[T any, It iter.Iterator[T, It]](a, b It) {
-	va := a.Value()
-	vb := b.Value()
-	a.SetValue(vb)
-	b.SetValue(va)
+	if !a.Equal(b) {
+		va := a.Value()
+		vb := b.Value()
+		a.SetValue(vb)
+		b.SetValue(va)
+	}
 }
 
 // Reverse the elements in the range [first, last]
