@@ -62,3 +62,8 @@ type RandomIterator[T any, It any] interface {
 	ConstRandomIterator[T, It]
 	SetValue(value T)
 }
+
+type Container[It any] interface {
+	Begin() It
+	End() It
+}

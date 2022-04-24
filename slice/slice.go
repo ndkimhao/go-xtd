@@ -10,12 +10,27 @@ func New[T any]() Slice[T] {
 	return nil
 }
 
+func NewLen[T any](len int) Slice[T] {
+	return make([]T, len)
+}
+
+func NewLenCap[T any](len, cap int) Slice[T] {
+	return make([]T, cap)
+}
+
 func Of[T any](values ...T) Slice[T] {
 	return values
 }
 
 func OfSlice[T any](values []T) Slice[T] {
 	return values
+}
+
+func Copy[T any](values []T) Slice[T] {
+	if len(values) == 0 {
+		return nil
+	}
+	return append([]T(nil), values...)
 }
 
 func (s *Slice[T]) Append(value T) {

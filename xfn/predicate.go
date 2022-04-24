@@ -175,3 +175,13 @@ func Less[T constraints.Ordered](lhs, rhs T) bool {
 func LessEq[T constraints.Ordered](lhs, rhs T) bool {
 	return lhs <= rhs
 }
+
+func LessFloat[T constraints.Float](lhs, rhs T) bool {
+	lhsNan := lhs != lhs
+	rhsNan := rhs != rhs
+	if lhsNan || rhsNan {
+		return lhsNan && !rhsNan
+	} else {
+		return lhs < rhs
+	}
+}
