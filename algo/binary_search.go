@@ -7,10 +7,10 @@ import (
 )
 
 func UpperBound[T constraints.Ordered, It iter.ConstRandomIterator[T, It]](first, last It, value T) It {
-	return UpperBoundComp(first, last, value, xfn.LessComparatorOf[T])
+	return UpperBoundComp(first, last, value, xfn.Less[T])
 }
 
-func UpperBoundComp[T any, It iter.ConstRandomIterator[T, It]](first, last It, value T, comp xfn.LessComparator[T]) It {
+func UpperBoundComp[T any, It iter.ConstRandomIterator[T, It]](first, last It, value T, comp xfn.Comparator[T]) It {
 	count := iter.Distance(first, last)
 	if count < 0 {
 		panic("invalid range")
@@ -31,10 +31,10 @@ func UpperBoundComp[T any, It iter.ConstRandomIterator[T, It]](first, last It, v
 }
 
 func LowerBound[T constraints.Ordered, It iter.ConstRandomIterator[T, It]](first, last It, value T) It {
-	return LowerBoundComp(first, last, value, xfn.LessComparatorOf[T])
+	return LowerBoundComp(first, last, value, xfn.Less[T])
 }
 
-func LowerBoundComp[T any, It iter.ConstRandomIterator[T, It]](first, last It, value T, comp xfn.LessComparator[T]) It {
+func LowerBoundComp[T any, It iter.ConstRandomIterator[T, It]](first, last It, value T, comp xfn.Comparator[T]) It {
 	count := iter.Distance(first, last)
 	if count < 0 {
 		panic("invalid range")

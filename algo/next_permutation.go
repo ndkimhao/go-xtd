@@ -7,10 +7,10 @@ import (
 )
 
 func NextPermutation[T constraints.Ordered, It iter.RandomIterator[T, It]](first, last It) bool {
-	return NextPermutationComp(first, last, xfn.LessComparatorOf[T])
+	return NextPermutationComp(first, last, xfn.Less[T])
 }
 
-func NextPermutationComp[T any, It iter.RandomIterator[T, It]](first, last It, comp xfn.LessComparator[T]) bool {
+func NextPermutationComp[T any, It iter.RandomIterator[T, It]](first, last It, comp xfn.Comparator[T]) bool {
 	rFirst := iter.ReverseRandomIterator[T](last)
 	rLast := iter.ReverseRandomIterator[T](first)
 	left := IsSortedUntilComp(rFirst, rLast, comp)

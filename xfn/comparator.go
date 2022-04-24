@@ -4,11 +4,14 @@ import (
 	"github.com/ndkimhao/go-xtd/constraints"
 )
 
-// Comparator returns a negative integer, zero, or a positive integer
-// as this object is less than, equal to, or greater than the specified object.
-type Comparator[T any] func(T, T) int
+// Comparator returns true if a < b
+type Comparator[T any] func(T, T) bool
 
-func ComparatorOf[T constraints.Ordered](a, b T) int {
+// FullComparator returns a negative integer, zero, or a positive integer
+// as the first object is less than, equal to, or greater than the second object.
+type FullComparator[T any] func(T, T) int
+
+func FullComparatorOf[T constraints.Ordered](a, b T) int {
 	switch {
 	case a < b:
 		return -1
@@ -17,10 +20,4 @@ func ComparatorOf[T constraints.Ordered](a, b T) int {
 	default:
 		return 0
 	}
-}
-
-type LessComparator[T any] func(T, T) bool
-
-func LessComparatorOf[T constraints.Ordered](a, b T) bool {
-	return a < b
 }
