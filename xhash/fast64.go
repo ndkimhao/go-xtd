@@ -14,20 +14,22 @@ func mix64(v uint64) uint64 {
 }
 
 type Fast64 struct {
-	mix uint64
+	m0 uint64
+	m1 uint64
 }
 
 const (
-	fast64MixInit uint64 = 8633297058295171728 // u64Hash(0)
+	fast64m0 uint64 = 8633297058295171728 // mix64(0)
+	fast64m1 uint64 = 6614235796240398542 // mix64(1)
 )
 
 func NewFast64() Fast64 {
-	return Fast64{mix: fast64MixInit}
+	return Fast64{m0: fast64m0, m1: fast64m1}
 }
 
 func (f *Fast64) WriteUint64(v uint64) {
-	v = mix64(v) ^ v
-	f.mix = mix64(f.mix ^ v)
+	f.m0 = mix64(f.m1 ^ v)
+	f.m1 = mix64(f.m0 ^ f.m1)
 }
 
 func (f *Fast64) Write(p []byte) (n int, err error) {
@@ -62,5 +64,5 @@ func (f *Fast64) BlockSize() int {
 }
 
 func (f *Fast64) Sum64() uint64 {
-	return mix64(f.mix) ^ f.mix
+	return f.m0 ^ f.m1
 }
