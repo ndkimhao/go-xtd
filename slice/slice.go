@@ -1,9 +1,5 @@
 package slice
 
-import (
-	"fmt"
-)
-
 type Slice[T any] []T
 
 func New[T any]() Slice[T] {
@@ -18,66 +14,64 @@ func OfSlice[T any](values []T) Slice[T] {
 	return values
 }
 
-func (v *Slice[T]) Append(value T) {
-	*v = append(*v, value)
+func (s *Slice[T]) Append(value T) {
+	*s = append(*s, value)
 }
 
-func (v *Slice[T]) AppendMany(values ...T) {
-	*v = append(*v, values...)
+func (s *Slice[T]) AppendMany(values ...T) {
+	*s = append(*s, values...)
 }
 
-func (v *Slice[T]) Delete(i int) {
-	s := *v
-	if i < len(s)-1 {
-		copy(s[i:], s[i+1:])
-	}
-	*v = s[:len(s)-1]
+func (s *Slice[T]) Delete(i int) {
+	*s = Delete(*s, i)
 }
 
-func (v *Slice[T]) DeleteLast() {
-	s := *v
-	*v = s[:len(s)-1]
+func (s *Slice[T]) DeleteLast() {
+	*s = DeleteLast(*s)
 }
 
-func UnorderedDelete[T any](s []T, i int) []T {
-	last := len(s) - 1
-	if i < last {
-		s[i], s[last] = s[last], s[i]
-	}
-	return s[:last]
+func (s *Slice[T]) UnorderedDelete(i int) {
+	*s = UnorderedDelete(*s, i)
 }
 
-func (v *Slice[T]) UnorderedDelete(i int) {
-	*v = UnorderedDelete(*v, i)
+func (s Slice[T]) Len() int {
+	return len(s)
 }
 
-func (v Slice[T]) Len() int {
-	return len(v)
+func (s Slice[T]) Cap() int {
+	return cap(s)
 }
 
-func (v Slice[T]) Cap() int {
-	return cap(v)
+func (s Slice[T]) Sub(start, end int) Slice[T] {
+	return s[start:end]
 }
 
-func (v Slice[T]) Sub(start, end int) Slice[T] {
-	return v[start:end]
+func (s Slice[T]) Slice() []T {
+	return s
 }
 
-func (v Slice[T]) Slice() []T {
-	return v
+func (s Slice[T]) At(i int) T {
+	return s[i]
 }
 
-func (v Slice[T]) At(n int) T {
-	if n < 0 || n >= len(v) {
-		panic(fmt.Sprint("index out of bound: n=", n, " len=", len(v)))
-	}
-	return v[n]
+func (s Slice[T]) Set(i int, x T) {
+	s[i] = x
 }
 
-func (v Slice[T]) First() T {
-	return v[0]
+func (s Slice[T]) First() T {
+	return s[0]
 }
 
-func (v Slice[T]) Last() T {
-	return v[len(v)-1]
+func (s Slice[T]) Last() T {
+	return s[len(s)-1]
+}
+
+// Begin returns the first iterator of s
+func (s Slice[T]) Begin() *Iterator[T] {
+	return &Iterator[T]{s: s, p: 0}
+}
+
+// End returns the end iterator of s
+func (s Slice[T]) End() *Iterator[T] {
+	return &Iterator[T]{s: s, p: s.Len()}
 }
