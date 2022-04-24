@@ -26,6 +26,8 @@ func Uint64(v uint64) uint64 {
 	h64 ^= (h64 >> 35) + 8
 	h64 *= prime64
 	h64 ^= h64 >> 28
+	h64 *= prime64
+	h64 ^= h64 >> 32
 	return h64
 }
 
@@ -37,6 +39,8 @@ func Uint64Seed(v uint64, seed uint64) uint64 {
 	h64 ^= (h64 >> 35) + seed
 	h64 *= prime64
 	h64 ^= h64 >> 28
+	h64 *= prime64
+	h64 ^= h64 >> 32
 	return h64
 }
 
