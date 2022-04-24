@@ -1,5 +1,9 @@
 package slice
 
+import (
+	"github.com/ndkimhao/go-xtd/iter"
+)
+
 type Slice[T any] []T
 
 func New[T any]() Slice[T] {
@@ -66,12 +70,18 @@ func (s Slice[T]) Last() T {
 	return s[len(s)-1]
 }
 
-// Begin returns the first iterator of s
 func (s Slice[T]) Begin() Iterator[T] {
 	return Iterator[T]{s: s, p: 0}
 }
 
-// End returns the end iterator of s
 func (s Slice[T]) End() Iterator[T] {
 	return Iterator[T]{s: s, p: s.Len()}
+}
+
+func (s Slice[T]) RBegin() iter.ReverseRandom[T, Iterator[T]] {
+	return iter.ReverseRandomIterator[T](s.End())
+}
+
+func (s Slice[T]) REnd() iter.ReverseRandom[T, Iterator[T]] {
+	return iter.ReverseRandomIterator[T](s.Begin())
 }

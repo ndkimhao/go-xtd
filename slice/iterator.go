@@ -26,14 +26,14 @@ func (iter Iterator[T]) SetValue(val T) {
 
 func (iter Iterator[T]) Next() Iterator[T] {
 	if iter.p >= iter.s.Len() {
-		panic("Iterator.Next: past end of slice")
+		panic("increase past end of slice")
 	}
 	return Iterator[T]{s: iter.s, p: iter.p + 1}
 }
 
 func (iter Iterator[T]) Prev() Iterator[T] {
 	if iter.p <= 0 {
-		panic("Iterator.Prev: past start of slice")
+		panic("decrease past start of slice")
 	}
 	return Iterator[T]{s: iter.s, p: iter.p - 1}
 }
@@ -41,7 +41,7 @@ func (iter Iterator[T]) Prev() Iterator[T] {
 func (iter Iterator[T]) Add(offset int) Iterator[T] {
 	k := iter.p + offset
 	if k < 0 && iter.s.Len() < k {
-		panic("Iterator.Add: out of bound")
+		panic("add out of bound")
 	}
 	return Iterator[T]{s: iter.s, p: k}
 }
@@ -52,7 +52,7 @@ func (iter Iterator[T]) Position() int {
 
 func (iter Iterator[T]) Equal(other Iterator[T]) bool {
 	if !ReferenceEqual(iter.s, other.s) {
-		panic("Iterator.Equal: compare iterator of different slices")
+		panic("compare iterator of different slices")
 	}
 	return other.p == iter.p
 }
