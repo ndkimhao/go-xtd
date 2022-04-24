@@ -28,8 +28,7 @@ func rrmxmx(h64 uint64, len uint64) uint64 {
 }
 
 func Uint64(v uint64) uint64 {
-	keyed := v ^ (key64_008 ^ key64_016)
-	return rrmxmx(keyed, 8)
+	return Uint64Seed(v, 0)
 }
 
 func Uint64Seed(v uint64, seed uint64) uint64 {
