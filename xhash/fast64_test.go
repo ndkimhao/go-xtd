@@ -4,6 +4,7 @@ import (
 	"math"
 	"math/bits"
 	"math/rand"
+	"runtime"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -52,4 +53,21 @@ func TestFast64_Sticky(t *testing.T) {
 	t.Run("Max", func(t *testing.T) {
 		_testSticky(t, func() uint64 { return math.MaxUint64 })
 	})
+}
+
+func BenchmarkFast64_WriteUint64(b *testing.B) {
+	h := xhash.NewFast64()
+	for i := 0; i < b.N; i++ {
+		h.WriteUint64(uint64(i))
+	}
+	runtime.KeepAlive(h.Sum64())
+}
+
+func BenchmarkFast64_Sum64(b *testing.B) {
+	h := xhash.NewFast64()
+	v := uint64(0)
+	for i := 0; i < b.N; i++ {
+		v += h.Sum64()
+	}
+	runtime.KeepAlive(v)
 }
