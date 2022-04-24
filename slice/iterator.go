@@ -34,30 +34,41 @@ func (iter Iterator[T]) SetValue(val T) {
 	*iter.Ref() = val
 }
 
-func (iter Iterator[T]) addUnchecked(offset int) Iterator[T] {
-	return Iterator[T]{pos: iter.pos + offset, len: iter.len, beg: iter.beg}
-}
-
 func (iter Iterator[T]) Next() Iterator[T] {
-	if iter.pos >= iter.len {
-		panic("next is out of bound")
-	}
-	return iter.addUnchecked(1)
+	iter.Incr()
+	return iter
 }
 
 func (iter Iterator[T]) Prev() Iterator[T] {
-	if iter.pos <= 0 {
-		panic("prev is out of bound")
-	}
-	return iter.addUnchecked(-1)
+	iter.Decr()
+	return iter
 }
 
 func (iter Iterator[T]) Add(offset int) Iterator[T] {
+	iter.Advance(offset)
+	return iter
+}
+
+func (iter *Iterator[T]) Incr() {
+	if iter.pos >= iter.len {
+		panic("increment out of bound")
+	}
+	iter.pos++
+}
+
+func (iter *Iterator[T]) Decr() {
+	if iter.pos <= 0 {
+		panic("decrement out of bound")
+	}
+	iter.pos--
+}
+
+func (iter *Iterator[T]) Advance(offset int) {
 	k := iter.pos + offset
 	if k < 0 || iter.len < k {
-		panic("add out of bound")
+		panic("offset out of bound")
 	}
-	return iter.addUnchecked(offset)
+	iter.pos = k
 }
 
 func (iter Iterator[T]) Position() int {

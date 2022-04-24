@@ -84,12 +84,8 @@ func TestSlice_At(t *testing.T) {
 	assert.Equal(t, 1, v.At(0))
 	assert.Equal(t, 2, v.At(1))
 	assert.Equal(t, 3, v.At(2))
-	assert.PanicsWithValue(t, "index out of bound: n=-1 len=3", func() {
-		_ = v.At(-1)
-	})
-	assert.PanicsWithValue(t, "index out of bound: n=3 len=3", func() {
-		_ = v.At(3)
-	})
+	assert.Panics(t, func() { v.At(-1) })
+	assert.Panics(t, func() { v.At(3) })
 }
 
 func TestSlice_Front(t *testing.T) {
