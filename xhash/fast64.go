@@ -12,28 +12,31 @@ const (
 	key64_000 uint64 = 0xbe4ba423396cfeb8
 	key64_008 uint64 = 0x1cad21f72c81017c
 	key64_016 uint64 = 0xdb979083e96dd4de
+	key64_024 uint64 = 0x1f67b3b7a4a44072
 )
 
 func NewFast64() Fast64 {
 	return Fast64{h: key64_000}
 }
 
-func rrmxmx(h64 uint64, len uint64) uint64 {
+func Uint64(v uint64) uint64 {
+	h64 := v ^ (key64_008 ^ key64_016)
 	h64 ^= bits.RotateLeft64(h64, 49) ^ bits.RotateLeft64(h64, 24)
 	h64 *= 0x9fb21c651e98df25
-	h64 ^= (h64 >> 35) + len
+	h64 ^= (h64 >> 35) + key64_024
 	h64 *= 0x9fb21c651e98df25
 	h64 ^= h64 >> 28
 	return h64
 }
 
-func Uint64(v uint64) uint64 {
-	return Uint64Seed(v, 0)
-}
-
 func Uint64Seed(v uint64, seed uint64) uint64 {
-	keyed := v ^ (key64_008 ^ key64_016)
-	return rrmxmx(keyed, seed)
+	h64 := v ^ (key64_008 ^ key64_016)
+	h64 ^= bits.RotateLeft64(h64, 49) ^ bits.RotateLeft64(h64, 24)
+	h64 *= 0x9fb21c651e98df25
+	h64 ^= (h64 >> 35) + seed
+	h64 *= 0x9fb21c651e98df25
+	h64 ^= h64 >> 28
+	return h64
 }
 
 func (f *Fast64) WriteUint64(v uint64) {
