@@ -2,6 +2,7 @@ package secrand
 
 import (
 	crypto_rand "crypto/rand"
+	"fmt"
 	"io"
 	"sync"
 
@@ -14,11 +15,24 @@ const (
 )
 
 var (
-	_rngNonce [chacha.NonceSize]byte
-
 	_masterRNG     = NewRNGFromReader(crypto_rand.Reader)
 	_masterRNGLock sync.Mutex
+
+	_defaultNonce = genDefaultNonce()
 )
+
+func mustRead(r io.Reader, b []byte) {
+	n, err := io.ReadFull(r, b)
+	if err != nil || n != len(b) {
+		panic(fmt.Sprint("error reading random source: ", err))
+	}
+}
+
+func genDefaultNonce() [chacha.NonceSize]byte {
+	var nonce [chacha.NonceSize]byte
+	mustRead(crypto_rand.Reader, nonce[:])
+	return nonce
+}
 
 // An RNG is a cryptographically-strong RNG constructed from the ChaCha stream
 // cipher.
@@ -26,18 +40,20 @@ type RNG struct {
 	buf    []byte
 	n      int
 	rounds int
+	nonce  [chacha.NonceSize]byte
 }
 
 func NewRNGFromSeed(seed [chacha.KeySize]byte) *RNG {
-	return NewRNGCustom(seed, DefaultBufSize, DefaultRounds)
+	return NewRNGCustom(seed, _defaultNonce, DefaultBufSize, DefaultRounds)
+}
+
+func NewRNGFromSeedNonce(seed [chacha.KeySize]byte, nonce [chacha.NonceSize]byte) *RNG {
+	return NewRNGCustom(seed, nonce, DefaultBufSize, DefaultRounds)
 }
 
 func NewRNGFromReader(r io.Reader) *RNG {
 	var seed [chacha.KeySize]byte
-	n, err := io.ReadFull(r, seed[:])
-	if err != nil || n != len(seed) {
-		panic("not enough system entropy to seed master RNG")
-	}
+	mustRead(r, seed[:])
 	return NewRNGFromSeed(seed)
 }
 
@@ -57,18 +73,19 @@ func NewRNG() *RNG {
 // NewRNGCustom returns a new RNG instance seeded with the provided entropy and
 // using the specified buffer size and number of ChaCha rounds. It panics if
 // bufsize < 32 or or rounds != 8, 12 or 20.
-func NewRNGCustom(seed [chacha.KeySize]byte, bufsize int, rounds int) *RNG {
+func NewRNGCustom(seed [chacha.KeySize]byte, nonce [chacha.NonceSize]byte, bufsize int, rounds int) *RNG {
 	if bufsize < chacha.KeySize*2 {
 		panic("frand: bufsize must be at least 64")
 	} else if !(rounds == 8 || rounds == 12 || rounds == 20) {
 		panic("frand: rounds must be 8, 12, or 20")
 	}
 	buf := make([]byte, chacha.KeySize+bufsize)
-	chacha.XORKeyStream(buf, buf, _rngNonce[:], seed[:], rounds)
+	chacha.XORKeyStream(buf, buf, nonce[:], seed[:], rounds)
 	return &RNG{
 		buf:    buf,
 		n:      chacha.KeySize,
 		rounds: rounds,
+		nonce:  nonce,
 	}
 }
 
@@ -88,14 +105,14 @@ func (r *RNG) Read(b []byte) (int, error) {
 	} else if len(b) <= len(r.buf[r.n:])+len(r.buf[chacha.KeySize:]) {
 		// b is larger than current buffer, but can be filled after a reseed
 		n := copy(b, r.buf[r.n:])
-		chacha.XORKeyStream(r.buf, r.buf, _rngNonce[:], r.buf[:chacha.KeySize], r.rounds)
+		chacha.XORKeyStream(r.buf, r.buf, r.nonce[:], r.buf[:chacha.KeySize], r.rounds)
 		r.n = chacha.KeySize + copyAndErase(b[n:], r.buf[chacha.KeySize:])
 	} else {
 		// filling b would require multiple reseeds; instead, generate a
 		// temporary key, then write directly into b using that key
 		var tmpKey [chacha.KeySize]byte
 		_, _ = r.Read(tmpKey[:])
-		chacha.XORKeyStream(b, b, _rngNonce[:], tmpKey[:], r.rounds)
+		chacha.XORKeyStream(b, b, r.nonce[:], tmpKey[:], r.rounds)
 		erase(tmpKey[:])
 	}
 	return len(b), nil
