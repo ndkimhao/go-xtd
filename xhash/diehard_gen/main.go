@@ -11,9 +11,9 @@ import (
 )
 
 var (
-	modeFast64     = flag.Bool("fast64", false, "Use xrand.Fast64, WriteUint64(0)")
-	modeUint64     = flag.Bool("uint64", false, "Use xrand.Uint64(i)")
-	modeUint64Seed = flag.Bool("uint64_seed", false, "Use xrand.Uint64Seed(0, i)")
+	modeFast64     = flag.Bool("fast64", false, "Use xhash.Fast64, WriteUint64(0)")
+	modeUint64     = flag.Bool("uint64", false, "Use xhash.Uint64(i)")
+	modeUint64Seed = flag.Bool("uint64_seed", false, "Use xhash.Uint64Seed(0, xhash.Uint64(i))")
 )
 
 func main() {
@@ -36,7 +36,7 @@ func main() {
 		}
 	} else if *modeUint64Seed {
 		for i := uint64(0); ; i++ {
-			write(xhash.Uint64Seed(0, i))
+			write(xhash.Uint64Seed(0, xhash.Uint64(i)))
 		}
 	} else {
 		fmt.Println("no mode selected")

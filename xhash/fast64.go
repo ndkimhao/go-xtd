@@ -29,11 +29,12 @@ func Uint64(v uint64) uint64 {
 	return h64
 }
 
+// Uint64Seed seed should be random (e.g., precompute seed by hashing it first)
 func Uint64Seed(v uint64, seed uint64) uint64 {
 	h64 := v ^ (key64_008 ^ key64_016)
 	h64 ^= bits.RotateLeft64(h64, 49) ^ bits.RotateLeft64(h64, 24)
 	h64 *= prime64
-	h64 ^= (h64 >> 35) + (seed * prime64)
+	h64 ^= (h64 >> 35) + seed
 	h64 *= prime64
 	h64 ^= h64 >> 28
 	return h64
