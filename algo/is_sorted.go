@@ -6,11 +6,7 @@ import (
 	"github.com/ndkimhao/go-xtd/xfn"
 )
 
-func IsSortedUntil[T constraints.Ordered, It iter.ConstIterator[T, It]](first, last It) It {
-	return IsSortedUntilComp[T, It](first, last, xfn.Less[T])
-}
-
-func IsSortedUntilComp[T any, It iter.ConstIterator[T, It]](first, last It, comp xfn.Comparator[T]) It {
+func IsSortedUntil[T any, It iter.ConstIterator[T, It]](first, last It, comp xfn.Comparator[T]) It {
 	if !first.Equal(last) {
 		next := first.Next()
 		for !next.Equal(last) {
@@ -24,10 +20,14 @@ func IsSortedUntilComp[T any, It iter.ConstIterator[T, It]](first, last It, comp
 	return last
 }
 
-func IsSorted[T constraints.Ordered, It iter.ConstIterator[T, It]](first, last It) bool {
-	return IsSortedUntilComp(first, last, xfn.Less[T]).Equal(last)
+func IsSorted[T any, It iter.ConstIterator[T, It]](first, last It, comp xfn.Comparator[T]) bool {
+	return IsSortedUntil(first, last, comp).Equal(last)
 }
 
-func IsSortedComp[T any, It iter.ConstIterator[T, It]](first, last It, comp xfn.Comparator[T]) bool {
-	return IsSortedUntilComp(first, last, comp).Equal(last)
+func IsSortedUntilOrdered[T constraints.Ordered, It iter.ConstIterator[T, It]](first, last It) It {
+	return IsSortedUntil[T, It](first, last, xfn.Less[T])
+}
+
+func IsSortedOrdered[T constraints.Ordered, It iter.ConstIterator[T, It]](first, last It) bool {
+	return IsSortedUntil(first, last, xfn.Less[T]).Equal(last)
 }
