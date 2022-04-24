@@ -5,8 +5,8 @@ import (
 	"github.com/ndkimhao/go-xtd/xtd"
 )
 
-// Iterator is a implementation of iter.RandomAccessIterator
-var _ iter.RandomAccessIterator[int, Iterator[int]] = Iterator[int]{}
+// Iterator is a implementation of iter.RandomIterator
+var _ iter.RandomIterator[int, Iterator[int]] = Iterator[int]{}
 
 // Iterator represents a slice iterator
 type Iterator[T any] struct {

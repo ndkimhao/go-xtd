@@ -18,3 +18,9 @@ func ComparatorOf[T constraints.Ordered](a, b T) int {
 		return 0
 	}
 }
+
+type LessComparator[T any] func(T, T) bool
+
+func LessComparatorOf[T constraints.Ordered](a, b T) bool {
+	return a < b
+}

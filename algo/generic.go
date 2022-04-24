@@ -1,28 +1,29 @@
 package algo
 
-//
-//// Swap swaps the value of two iterator
-//func Swap[T any](a, b iter.Iterator[T]) {
-//	va := a.Value()
-//	vb := b.Value()
-//	a.SetValue(vb)
-//	b.SetValue(va)
-//}
-//
-//// Reverse reverse the elements in the range [first, last]
-//func Reverse[T any](first, last iter.BidIterator[T]) {
-//	left := first.Clone().(iter.BidIterator[T])
-//	right := last.Clone().(iter.BidIterator[T])
-//	for !left.Equal(right) {
-//		right.Prev()
-//		if left.Equal(right) {
-//			break
-//		}
-//		Swap[T](left, right)
-//		left.Next()
-//	}
-//}
-//
+import (
+	"github.com/ndkimhao/go-xtd/iter"
+)
+
+// Swap swaps the value of two iterator
+func Swap[T any, It iter.Iterator[T, It]](a, b It) {
+	va := a.Value()
+	vb := b.Value()
+	a.SetValue(vb)
+	b.SetValue(va)
+}
+
+// Reverse the elements in the range [first, last]
+func Reverse[T any, It iter.BidirIterator[T, It]](first, last It) {
+	for !first.Equal(last) {
+		last = last.Prev()
+		if first.Equal(last) {
+			break
+		}
+		Swap[T](first, last)
+		first = first.Next()
+	}
+}
+
 //// Count returns the number of elements that their value is equal to value in range [first, last)
 //func Count[T comparable](first, last iter.ConstIterator[T], value T) int {
 //	var count int
