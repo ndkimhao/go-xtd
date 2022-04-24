@@ -1,35 +1,37 @@
 package xhash
 
-// Thomas Wang’s integer hash functions
-// Based on https://naml.us/post/inverse-of-a-hash-function/
-func mix64(v uint64) uint64 {
-	v = (^v) + (v << 21) // v = (v << 21) - v - 1;
-	v = v ^ (v >> 24)
-	v = (v + (v << 3)) + (v << 8) // v * 265
-	v = v ^ (v >> 14)
-	v = (v + (v << 2)) + (v << 4) // v * 21
-	v = v ^ (v >> 28)
-	v = v + (v << 31)
-	return v
-}
+import (
+	"math/bits"
+)
 
 type Fast64 struct {
-	m0 uint64
-	m1 uint64
+	h uint64
 }
 
 const (
-	fast64m0 uint64 = 8633297058295171728 // mix64(0)
-	fast64m1 uint64 = 6614235796240398542 // mix64(1)
+	key64_000 uint64 = 0xbe4ba423396cfeb8
+	key64_008 uint64 = 0x1cad21f72c81017c
+	key64_016 uint64 = 0xdb979083e96dd4de
+	key64_024 uint64 = 0x1f67b3b7a4a44072
+	key64_032 uint64 = 0x78e5c0cc4ee679cb
 )
 
 func NewFast64() Fast64 {
-	return Fast64{m0: fast64m0, m1: fast64m1}
+	return Fast64{h: key64_000}
+}
+
+func rrmxmx(h64 uint64, len uint64) uint64 {
+	h64 ^= bits.RotateLeft64(h64, 49) ^ bits.RotateLeft64(h64, 24)
+	h64 *= 0x9fb21c651e98df25
+	h64 ^= (h64 >> 35) + len
+	h64 *= 0x9fb21c651e98df25
+	h64 ^= h64 >> 28
+	return h64
 }
 
 func (f *Fast64) WriteUint64(v uint64) {
-	f.m0 = mix64(f.m1 ^ v)
-	f.m1 = (f.m1 + (f.m0 << 3)) + (f.m1 << 8)
+	keyed := v ^ (key64_008 ^ key64_016)
+	f.h = rrmxmx(keyed, f.h)
 }
 
 func (f *Fast64) Write(p []byte) (n int, err error) {
@@ -65,5 +67,6 @@ func (f *Fast64) BlockSize() int {
 }
 
 func (f *Fast64) Sum64() uint64 {
-	return f.m0 ^ f.m1
+	keyed := f.h ^ (key64_024 ^ key64_032)
+	return rrmxmx(keyed, 8)
 }
