@@ -4,15 +4,16 @@ import (
 	"bufio"
 	"encoding/binary"
 	"flag"
+	"fmt"
 	"os"
 
 	"github.com/ndkimhao/go-xtd/xhash"
 )
 
 var (
+	modeFast64     = flag.Bool("fast64", false, "Use xrand.Fast64, WriteUint64(0)")
 	modeUint64     = flag.Bool("uint64", false, "Use xrand.Uint64(i)")
 	modeUint64Seed = flag.Bool("uint64_seed", false, "Use xrand.Uint64Seed(0, i)")
-	modeFast64     = flag.Bool("fast64", false, "Use xrand.Fast64, WriteUint64(0)")
 )
 
 func main() {
@@ -38,6 +39,6 @@ func main() {
 			write(xhash.Uint64Seed(0, i))
 		}
 	} else {
-		panic("no mode selected")
+		fmt.Println("no mode selected")
 	}
 }
