@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/ndkimhao/go-xtd/xhash"
+	"github.com/ndkimhao/go-xtd/xmap"
 )
 
 // Basic test, ensure no sticky 0/1 bits
@@ -53,6 +54,46 @@ func TestFast64_Sticky(t *testing.T) {
 	t.Run("Max", func(t *testing.T) {
 		_testSticky(t, func() uint64 { return math.MaxUint64 })
 	})
+}
+
+func TestFast64_Write(t *testing.T) {
+	t.Run("Partial Write", func(t *testing.T) {
+		seen := xmap.NewSet[uint64]()
+		b := make([]byte, 32)
+		for i := 0; i <= len(b); i++ {
+			h1 := xhash.NewFast64()
+			_, _ = h1.Write(b[:i])
+			assert.True(t, seen.TryAdd(h1.Sum64()))
+
+			if i > 0 {
+				h2 := xhash.NewFast64()
+				b[i-1] = 1
+				_, _ = h2.Write(b[:i])
+				b[i-1] = 0
+				assert.True(t, seen.TryAdd(h2.Sum64()))
+			}
+		}
+	})
+}
+
+func TestFast64_Reset(t *testing.T) {
+	h := xhash.NewFast64()
+	h.WriteUint64(1)
+	old := h.Sum64()
+	h.Reset()
+	h.WriteUint64(1)
+	assert.Equal(t, old, h.Sum64())
+}
+
+func BenchmarkFast64_Write(b *testing.B) {
+	sz := int64(4 << 10)
+	b.SetBytes(sz)
+	buf := make([]byte, sz)
+	h := xhash.NewFast64()
+	for i := 0; i < b.N; i++ {
+		_, _ = h.Write(buf)
+	}
+	runtime.KeepAlive(h.Sum64())
 }
 
 func BenchmarkFast64_WriteUint64(b *testing.B) {

@@ -42,6 +42,7 @@ func (f *Fast64) Write(p []byte) (n int, err error) {
 		copy(rem[:], p[i:])
 		f.WriteUint64(toUint64(rem[:]))
 	}
+	f.WriteUint64(uint64(len(p)))
 	return i, nil
 }
 
