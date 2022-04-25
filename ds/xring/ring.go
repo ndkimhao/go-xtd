@@ -1,4 +1,4 @@
-package ring
+package xring
 
 type Ring[T any] struct {
 	buf []T
@@ -91,7 +91,7 @@ func (r *Ring[T]) Pop() T {
 func (r *Ring[T]) Append(value T) {
 	r.checkGrowth()
 	i := r.st + r.len
-	if i > len(r.buf) {
+	if i >= len(r.buf) {
 		i -= len(r.buf)
 	}
 	r.buf[i] = value
@@ -99,6 +99,7 @@ func (r *Ring[T]) Append(value T) {
 }
 
 func (r *Ring[T]) Prepend(value T) {
+	r.checkGrowth()
 	i := r.st - 1
 	if i < 0 {
 		i += len(r.buf)
@@ -112,6 +113,7 @@ func (r *Ring[T]) DeleteLast() {
 	if r.len == 0 {
 		panic("delete from empty queue")
 	}
+	r.checkShrink()
 	i := r.st + r.len - 1
 	if i >= len(r.buf) {
 		i -= len(r.buf)
@@ -125,9 +127,11 @@ func (r *Ring[T]) DeleteFirst() {
 	if r.len == 0 {
 		panic("delete from empty queue")
 	}
+	r.checkShrink()
 	var zero T
 	r.buf[r.st] = zero
 	r.st++
+	r.len--
 	if r.st == len(r.buf) {
 		r.st = 0
 	}
