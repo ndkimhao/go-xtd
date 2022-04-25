@@ -19,7 +19,7 @@ type Iterator[T any] struct {
 	beg *T
 }
 
-func (iter Iterator[T]) Ref() *T {
+func (iter Iterator[T]) ValueRef() *T {
 	if iter.pos < 0 || iter.len <= iter.pos {
 		panic("ref out of bound")
 	}
@@ -27,11 +27,11 @@ func (iter Iterator[T]) Ref() *T {
 }
 
 func (iter Iterator[T]) Value() T {
-	return *iter.Ref()
+	return *iter.ValueRef()
 }
 
 func (iter Iterator[T]) SetValue(val T) {
-	*iter.Ref() = val
+	*iter.ValueRef() = val
 }
 
 func (iter Iterator[T]) Next() Iterator[T] {

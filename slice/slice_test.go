@@ -108,3 +108,31 @@ func TestSlice_Reversed(t *testing.T) {
 	assert.Equal(t, slice.Of(1, 2, 3), slice.Of(3, 2, 1).Reversed())
 	assert.Equal(t, slice.Of(1, 2, 3, 4), slice.Of(4, 3, 2, 1).Reversed())
 }
+
+func TestSlice_Insert(t *testing.T) {
+	t.Run("From Empty", func(t *testing.T) {
+		s := slice.Of[int]()
+		s.Insert(0, 5)
+		assert.Equal(t, slice.Of(5), s)
+	})
+	t.Run("Begin", func(t *testing.T) {
+		s := slice.Of(1, 2, 3)
+		s.Insert(0, 5)
+		assert.Equal(t, slice.Of(5, 1, 2, 3), s)
+	})
+	t.Run("Last", func(t *testing.T) {
+		s := slice.Of(1, 2, 3)
+		s.Insert(3, 5)
+		assert.Equal(t, slice.Of(1, 2, 3, 5), s)
+	})
+	t.Run("Middle", func(t *testing.T) {
+		s := slice.Of(1, 2, 3, 4, 5, 6)
+		s.Insert(2, 10)
+		assert.Equal(t, slice.Of(1, 2, 10, 3, 4, 5, 6), s)
+	})
+	t.Run("Panic", func(t *testing.T) {
+		s := slice.Of(1, 2, 3)
+		assert.Panics(t, func() { s.Insert(-1, 10) })
+		assert.Panics(t, func() { s.Insert(4, 10) })
+	})
+}

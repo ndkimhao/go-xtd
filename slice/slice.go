@@ -53,12 +53,20 @@ func (s *Slice[T]) UnorderedDelete(i int) {
 	*s = UnorderedDelete(*s, i)
 }
 
+func (s *Slice[T]) Insert(i int, value T) {
+	*s = Insert(*s, i, value)
+}
+
 func (s Slice[T]) Len() int {
 	return len(s)
 }
 
 func (s Slice[T]) Cap() int {
 	return cap(s)
+}
+
+func (s Slice[T]) Empty() bool {
+	return len(s) == 0
 }
 
 func (s Slice[T]) Sub(start, end int) Slice[T] {
