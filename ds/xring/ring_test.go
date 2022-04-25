@@ -30,6 +30,8 @@ func TestRing(t *testing.T) {
 		require.Equal(t, 5, r.First())
 		require.Equal(t, []int{5, 1, 1, 2, 3, 4}, r.ToSlice(nil))
 		require.Equal(t, 8, r.Cap())
+		require.Panics(t, func() { r.At(-1) })
+		require.Panics(t, func() { r.At(6) })
 	})
 }
 
@@ -42,6 +44,8 @@ func TestRing_Large(t *testing.T) {
 	for i := 1; i <= n; i++ {
 		r.Append(i)
 		r.Prepend(-i)
+		require.Equal(t, -i, r.At(0))
+		require.Equal(t, i, r.At(r.Len()-1))
 	}
 	require.GreaterOrEqual(t, r.Cap(), n*2)
 	for i := n; i >= n/2; i-- {
