@@ -6,9 +6,9 @@ import (
 	"github.com/ndkimhao/go-xtd/xfn"
 )
 
-func NextPermutation[T any, It iter.RandomIterator[T, It]](first, last It, comp xfn.Comparator[T]) bool {
-	rFirst := iter.ReverseRandomIterator[T](last)
-	rLast := iter.ReverseRandomIterator[T](first)
+func NextPermutationIterators[T any, It iter.RandomIterator[T, It]](first, last It, comp xfn.Comparator[T]) bool {
+	rFirst := iter.MakeReverseRandom[T](last)
+	rLast := iter.MakeReverseRandom[T](first)
 	left := IsSortedUntil(rFirst, rLast, comp)
 	if !left.Equal(rLast) {
 		right := UpperBound[T](rFirst, left, left.Value(), comp)
@@ -18,6 +18,10 @@ func NextPermutation[T any, It iter.RandomIterator[T, It]](first, last It, comp 
 	return !left.Equal(rLast)
 }
 
-func NextPermutationOrdered[T constraints.Ordered, It iter.RandomIterator[T, It]](first, last It) bool {
-	return NextPermutation(first, last, xfn.Less[T])
+func NextPermutation[T constraints.Ordered, It iter.RandomIterator[T, It]](r iter.Range[T, It]) bool {
+	return NextPermutationIterators(r.Begin, r.End, xfn.Less[T])
+}
+
+func NextPermutationAny[T any, It iter.RandomIterator[T, It]](r iter.Range[T, It], comp xfn.Comparator[T]) bool {
+	return NextPermutationIterators(r.Begin, r.End, comp)
 }

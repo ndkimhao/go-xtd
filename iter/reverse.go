@@ -2,31 +2,31 @@ package iter
 
 // Const Iterator
 
-type ReverseConst[T any, It ConstBidirIterator[T, It]] struct {
+type ConstReverse[T any, It ConstBidirIterator[T, It]] struct {
 	i It
 }
 
-func ReverseConstIterator[T any, It ConstBidirIterator[T, It]](i It) ReverseConst[T, It] {
-	return ReverseConst[T, It]{i: i}
+func MakeConstReverse[T any, It ConstBidirIterator[T, It]](i It) ConstReverse[T, It] {
+	return ConstReverse[T, It]{i: i}
 }
 
-func (c ReverseConst[T, It]) Base() It {
+func (c ConstReverse[T, It]) Base() It {
 	return c.i
 }
 
-func (c ReverseConst[T, It]) Next() ReverseConst[T, It] {
-	return ReverseConst[T, It]{i: c.i.Prev()}
+func (c ConstReverse[T, It]) Next() ConstReverse[T, It] {
+	return ConstReverse[T, It]{i: c.i.Prev()}
 }
 
-func (c ReverseConst[T, It]) Prev() ReverseConst[T, It] {
-	return ReverseConst[T, It]{i: c.i.Next()}
+func (c ConstReverse[T, It]) Prev() ConstReverse[T, It] {
+	return ConstReverse[T, It]{i: c.i.Next()}
 }
 
-func (c ReverseConst[T, It]) Value() T {
+func (c ConstReverse[T, It]) Value() T {
 	return c.i.Prev().Value()
 }
 
-func (c ReverseConst[T, It]) Equal(other ReverseConst[T, It]) bool {
+func (c ConstReverse[T, It]) Equal(other ConstReverse[T, It]) bool {
 	return c.i.Equal(other.i)
 }
 
@@ -36,7 +36,7 @@ type Reverse[T any, It BidirIterator[T, It]] struct {
 	i It
 }
 
-func ReverseIterator[T any, It BidirIterator[T, It]](i It) Reverse[T, It] {
+func MakeReverse[T any, It BidirIterator[T, It]](i It) Reverse[T, It] {
 	return Reverse[T, It]{i: i}
 }
 
@@ -66,39 +66,39 @@ func (c Reverse[T, It]) Equal(other Reverse[T, It]) bool {
 
 // Random
 
-type ReverseConstRandom[T any, It ConstRandomIterator[T, It]] struct {
+type ConstReverseRandom[T any, It ConstRandomIterator[T, It]] struct {
 	i It
 }
 
-func ReverseConstRandomIterator[T any, It ConstRandomIterator[T, It]](i It) ReverseConstRandom[T, It] {
-	return ReverseConstRandom[T, It]{i: i}
+func MakeConstReverseRandom[T any, It ConstRandomIterator[T, It]](i It) ConstReverseRandom[T, It] {
+	return ConstReverseRandom[T, It]{i: i}
 }
 
-func (c ReverseConstRandom[T, It]) Base() It {
+func (c ConstReverseRandom[T, It]) Base() It {
 	return c.i
 }
 
-func (c ReverseConstRandom[T, It]) Next() ReverseConstRandom[T, It] {
-	return ReverseConstRandom[T, It]{i: c.i.Prev()}
+func (c ConstReverseRandom[T, It]) Next() ConstReverseRandom[T, It] {
+	return ConstReverseRandom[T, It]{i: c.i.Prev()}
 }
 
-func (c ReverseConstRandom[T, It]) Prev() ReverseConstRandom[T, It] {
-	return ReverseConstRandom[T, It]{i: c.i.Next()}
+func (c ConstReverseRandom[T, It]) Prev() ConstReverseRandom[T, It] {
+	return ConstReverseRandom[T, It]{i: c.i.Next()}
 }
 
-func (c ReverseConstRandom[T, It]) Add(offset int) ReverseConstRandom[T, It] {
-	return ReverseConstRandom[T, It]{i: c.i.Add(-offset)}
+func (c ConstReverseRandom[T, It]) Add(offset int) ConstReverseRandom[T, It] {
+	return ConstReverseRandom[T, It]{i: c.i.Add(-offset)}
 }
 
-func (c ReverseConstRandom[T, It]) Position() int {
+func (c ConstReverseRandom[T, It]) Position() int {
 	return -c.i.Position()
 }
 
-func (c ReverseConstRandom[T, It]) Value() T {
+func (c ConstReverseRandom[T, It]) Value() T {
 	return c.i.Prev().Value()
 }
 
-func (c ReverseConstRandom[T, It]) Equal(other ReverseConstRandom[T, It]) bool {
+func (c ConstReverseRandom[T, It]) Equal(other ConstReverseRandom[T, It]) bool {
 	return c.i.Equal(other.i)
 }
 
@@ -108,7 +108,7 @@ type ReverseRandom[T any, It RandomIterator[T, It]] struct {
 	i It
 }
 
-func ReverseRandomIterator[T any, It RandomIterator[T, It]](i It) ReverseRandom[T, It] {
+func MakeReverseRandom[T any, It RandomIterator[T, It]](i It) ReverseRandom[T, It] {
 	return ReverseRandom[T, It]{i: i}
 }
 

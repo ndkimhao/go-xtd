@@ -114,11 +114,27 @@ func (s Slice[T]) End() Iterator[T] {
 }
 
 func (s Slice[T]) RBegin() iter.ReverseRandom[T, Iterator[T]] {
-	return iter.ReverseRandomIterator[T](s.End())
+	return iter.MakeReverseRandom[T](s.End())
 }
 
 func (s Slice[T]) REnd() iter.ReverseRandom[T, Iterator[T]] {
-	return iter.ReverseRandomIterator[T](s.Begin())
+	return iter.MakeReverseRandom[T](s.Begin())
+}
+
+func (s Slice[T]) Range() iter.Range[T, Iterator[T]] {
+	return iter.MakeRange[T](s.Begin(), s.End())
+}
+
+func (s Slice[T]) SubRange(first, last int) iter.Range[T, Iterator[T]] {
+	return iter.MakeRange[T](s.IteratorAt(first), s.IteratorAt(last))
+}
+
+func (s Slice[T]) ReverseRange() iter.Range[T, iter.ReverseRandom[T, Iterator[T]]] {
+	return iter.MakeRange[T](s.RBegin(), s.REnd())
+}
+
+func (s Slice[T]) ReverseSubRange(first, last int) iter.Range[T, iter.ReverseRandom[T, Iterator[T]]] {
+	return iter.MakeRange[T](s.RBegin().Add(first), s.RBegin().Add(last))
 }
 
 func (s Slice[T]) Reversed() Slice[T] {
