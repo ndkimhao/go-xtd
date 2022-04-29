@@ -20,6 +20,14 @@ func (h Hasher[T]) HashSeed(value T, seed uint64) uint64 {
 	return uint64(h(unsafe.Pointer(&value), uintptr(seed)))
 }
 
+func (h Hasher[T]) HashPointer(value *T) uint64 {
+	return uint64(h(unsafe.Pointer(value), defaultSeed))
+}
+
+func (h Hasher[T]) HashPointerSeed(value *T, seed uint64) uint64 {
+	return uint64(h(unsafe.Pointer(value), uintptr(seed)))
+}
+
 func Of[T comparable]() Hasher[T] {
 	var m interface{} = (map[T]struct{})(nil)
 	return (*maptype)(*(*unsafe.Pointer)(unsafe.Pointer(&m))).hasher
