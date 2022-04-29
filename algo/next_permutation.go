@@ -7,8 +7,8 @@ import (
 )
 
 func NextPermutationIterators[T any, It iter.RandomIterator[T, It]](first, last It, comp xfn.Comparator[T]) bool {
-	rFirst := iter.MakeReverseRandom[T](last)
-	rLast := iter.MakeReverseRandom[T](first)
+	rFirst := iter.ReverseRandom[T](last)
+	rLast := iter.ReverseRandom[T](first)
 	left := IsSortedUntil(rFirst, rLast, comp)
 	if !left.Equal(rLast) {
 		right := UpperBound[T](rFirst, left, left.Value(), comp)
