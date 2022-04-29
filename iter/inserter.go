@@ -8,6 +8,10 @@ type Appender[T any] interface {
 	Append(value T)
 }
 
+func Append[T any](a Appender[T]) AppendIterator[T] {
+	return AppendIterator[T]{a: a}
+}
+
 type AppendIterator[T any] struct {
 	a Appender[T]
 }
@@ -34,6 +38,10 @@ type Prepender[T any] interface {
 
 type PrependIterator[T any] struct {
 	p Prepender[T]
+}
+
+func Prepend[T any](p Prepender[T]) PrependIterator[T] {
+	return PrependIterator[T]{p: p}
 }
 
 func (it PrependIterator[T]) Next() PrependIterator[T] {
