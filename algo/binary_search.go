@@ -15,7 +15,7 @@ func UpperBoundIterators[T any, It iter.ConstRandomIterator[T, It]](first, last 
 		it := first
 		step := count / 2
 		it = it.Add(step)
-		if !comp(value, it.Value()) {
+		if !comp(value, it.Get()) {
 			it = it.Next()
 			first = it
 			count -= step + 1
@@ -35,7 +35,7 @@ func LowerBoundIterators[T any, It iter.ConstRandomIterator[T, It]](first, last 
 		it := first
 		step := count / 2
 		it = it.Add(step)
-		if comp(it.Value(), value) {
+		if comp(it.Get(), value) {
 			it = it.Next()
 			first = it
 			count -= step + 1

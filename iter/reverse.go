@@ -1,6 +1,7 @@
 package iter
 
-// Const Iterator
+// ConstReverseIterator implements ConstIterator
+var _ ConstIterator[int, ConstReverseIterator[int, DummyIterator[int]]] = ConstReverseIterator[int, DummyIterator[int]]{}
 
 type ConstReverseIterator[T any, It ConstBidirIterator[T, It]] struct {
 	i It
@@ -22,49 +23,51 @@ func (c ConstReverseIterator[T, It]) Prev() ConstReverseIterator[T, It] {
 	return ConstReverseIterator[T, It]{i: c.i.Next()}
 }
 
-func (c ConstReverseIterator[T, It]) Value() T {
-	return c.i.Prev().Value()
+func (c ConstReverseIterator[T, It]) Get() T {
+	return c.i.Prev().Get()
 }
 
 func (c ConstReverseIterator[T, It]) Equal(other ConstReverseIterator[T, It]) bool {
 	return c.i.Equal(other.i)
 }
 
-// Iterator
+// ReverseIterator implements Iterator
+var _ Iterator[int, ReverseIterator[int, DummyIterator[int]]] = ReverseIterator[int, DummyIterator[int]]{}
 
-type ReverseItarator[T any, It BidirIterator[T, It]] struct {
+type ReverseIterator[T any, It BidirIterator[T, It]] struct {
 	i It
 }
 
-func Reverse[T any, It BidirIterator[T, It]](i It) ReverseItarator[T, It] {
-	return ReverseItarator[T, It]{i: i}
+func Reverse[T any, It BidirIterator[T, It]](i It) ReverseIterator[T, It] {
+	return ReverseIterator[T, It]{i: i}
 }
 
-func (c ReverseItarator[T, It]) Base() It {
+func (c ReverseIterator[T, It]) Base() It {
 	return c.i
 }
 
-func (c ReverseItarator[T, It]) Next() ReverseItarator[T, It] {
-	return ReverseItarator[T, It]{i: c.i.Prev()}
+func (c ReverseIterator[T, It]) Next() ReverseIterator[T, It] {
+	return ReverseIterator[T, It]{i: c.i.Prev()}
 }
 
-func (c ReverseItarator[T, It]) Prev() ReverseItarator[T, It] {
-	return ReverseItarator[T, It]{i: c.i.Next()}
+func (c ReverseIterator[T, It]) Prev() ReverseIterator[T, It] {
+	return ReverseIterator[T, It]{i: c.i.Next()}
 }
 
-func (c ReverseItarator[T, It]) Value() T {
-	return c.i.Prev().Value()
+func (c ReverseIterator[T, It]) Get() T {
+	return c.i.Prev().Get()
 }
 
-func (c ReverseItarator[T, It]) SetValue(value T) {
-	c.i.Prev().SetValue(value)
+func (c ReverseIterator[T, It]) Set(value T) {
+	c.i.Prev().Set(value)
 }
 
-func (c ReverseItarator[T, It]) Equal(other ReverseItarator[T, It]) bool {
+func (c ReverseIterator[T, It]) Equal(other ReverseIterator[T, It]) bool {
 	return c.i.Equal(other.i)
 }
 
-// Random
+// ConstReverseRandomIterator implements ConstRandomIterator
+var _ ConstRandomIterator[int, ConstReverseRandomIterator[int, DummyIterator[int]]] = ConstReverseRandomIterator[int, DummyIterator[int]]{}
 
 type ConstReverseRandomIterator[T any, It ConstRandomIterator[T, It]] struct {
 	i It
@@ -90,19 +93,20 @@ func (c ConstReverseRandomIterator[T, It]) Add(offset int) ConstReverseRandomIte
 	return ConstReverseRandomIterator[T, It]{i: c.i.Add(-offset)}
 }
 
-func (c ConstReverseRandomIterator[T, It]) Position() int {
-	return -c.i.Position()
+func (c ConstReverseRandomIterator[T, It]) Pos() int {
+	return -c.i.Pos()
 }
 
-func (c ConstReverseRandomIterator[T, It]) Value() T {
-	return c.i.Prev().Value()
+func (c ConstReverseRandomIterator[T, It]) Get() T {
+	return c.i.Prev().Get()
 }
 
 func (c ConstReverseRandomIterator[T, It]) Equal(other ConstReverseRandomIterator[T, It]) bool {
 	return c.i.Equal(other.i)
 }
 
-// Random
+// ReverseRandomIterator implements RandomIterator
+var _ RandomIterator[int, ReverseRandomIterator[int, DummyIterator[int]]] = ReverseRandomIterator[int, DummyIterator[int]]{}
 
 type ReverseRandomIterator[T any, It RandomIterator[T, It]] struct {
 	i It
@@ -128,16 +132,16 @@ func (c ReverseRandomIterator[T, It]) Add(offset int) ReverseRandomIterator[T, I
 	return ReverseRandomIterator[T, It]{i: c.i.Add(-offset)}
 }
 
-func (c ReverseRandomIterator[T, It]) Position() int {
-	return -c.i.Position()
+func (c ReverseRandomIterator[T, It]) Pos() int {
+	return -c.i.Pos()
 }
 
-func (c ReverseRandomIterator[T, It]) Value() T {
-	return c.i.Prev().Value()
+func (c ReverseRandomIterator[T, It]) Get() T {
+	return c.i.Prev().Get()
 }
 
-func (c ReverseRandomIterator[T, It]) SetValue(value T) {
-	c.i.Prev().SetValue(value)
+func (c ReverseRandomIterator[T, It]) Set(value T) {
+	c.i.Prev().Set(value)
 }
 
 func (c ReverseRandomIterator[T, It]) Equal(other ReverseRandomIterator[T, It]) bool {

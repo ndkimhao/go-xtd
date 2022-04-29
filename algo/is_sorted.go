@@ -10,7 +10,7 @@ func IsSortedUntilIterators[T any, It iter.ConstIterator[T, It]](first, last It,
 	if !first.Equal(last) {
 		next := first.Next()
 		for !next.Equal(last) {
-			if comp(next.Value(), first.Value()) {
+			if comp(next.Get(), first.Get()) {
 				return next
 			}
 			first = next

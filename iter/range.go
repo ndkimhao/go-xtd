@@ -18,5 +18,5 @@ func SubRange[T any, It ConstRandomIterator[T, It]](r Range[T, It], first, last 
 }
 
 func RangeDistance[T any, It ConstRandomIterator[T, It]](r Range[T, It]) int {
-	return r.End.Position() - r.Begin.Position()
+	return r.End.Pos() - r.Begin.Pos()
 }

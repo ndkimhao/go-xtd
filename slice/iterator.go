@@ -7,7 +7,7 @@ import (
 	"github.com/ndkimhao/go-xtd/xtd"
 )
 
-// Iterator is a implementation of iter.RandomIterator
+// Iterator implements iter.RandomIterator
 var _ iter.RandomIterator[int, Iterator[int]] = Iterator[int]{}
 
 // Iterator represents a slice iterator
@@ -19,19 +19,19 @@ type Iterator[T any] struct {
 	beg *T
 }
 
-func (iter Iterator[T]) ValueRef() *T {
+func (iter Iterator[T]) Ref() *T {
 	if iter.pos < 0 || iter.len <= iter.pos {
 		panic("ref out of bound")
 	}
 	return (*T)(unsafe.Add(unsafe.Pointer((*T)(iter.beg)), uintptr(iter.pos)*unsafe.Sizeof(*(*T)(nil))))
 }
 
-func (iter Iterator[T]) Value() T {
-	return *iter.ValueRef()
+func (iter Iterator[T]) Get() T {
+	return *iter.Ref()
 }
 
-func (iter Iterator[T]) SetValue(val T) {
-	*iter.ValueRef() = val
+func (iter Iterator[T]) Set(val T) {
+	*iter.Ref() = val
 }
 
 func (iter Iterator[T]) Next() Iterator[T] {
@@ -71,7 +71,7 @@ func (iter *Iterator[T]) Advance(offset int) {
 	iter.pos = k
 }
 
-func (iter Iterator[T]) Position() int {
+func (iter Iterator[T]) Pos() int {
 	return iter.pos
 }
 

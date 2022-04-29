@@ -7,10 +7,10 @@ import (
 // Swap swaps the value of two iterator
 func Swap[T any, It iter.Iterator[T, It]](a, b It) {
 	if !a.Equal(b) {
-		va := a.Value()
-		vb := b.Value()
-		a.SetValue(vb)
-		b.SetValue(va)
+		va := a.Get()
+		vb := b.Get()
+		a.Set(vb)
+		b.Set(va)
 	}
 }
 
@@ -30,7 +30,7 @@ func Reverse[T any, It iter.BidirIterator[T, It]](first, last It) {
 //func Count[T comparable](first, last iter.ConstIterator[T], value T) int {
 //	var count int
 //	for iter := first.Clone(); !iter.Equal(last); iter.Next() {
-//		if iter.Value() == value {
+//		if iter.Get() == value {
 //			count++
 //		}
 //	}
@@ -51,7 +51,7 @@ func Reverse[T any, It iter.BidirIterator[T, It]](first, last It) {
 //// Find finds the first element that its value is equal to value in range [first, last), and returns its iterator, or last if not found
 //func Find[T comparable](first, last iter.ConstIterator[T], value T) iter.ConstIterator[T] {
 //	for iter := first.Clone(); !iter.Equal(last); iter.Next() {
-//		if iter.Value() == value {
+//		if iter.Get() == value {
 //			return iter
 //		}
 //	}
@@ -72,7 +72,7 @@ func Reverse[T any, It iter.BidirIterator[T, It]](first, last It) {
 //func MaxElement[T constraints.Ordered](first, last iter.ConstIterator[T]) iter.ConstIterator[T] {
 //	largest := first
 //	for iter := first.Clone(); !iter.Equal(last); iter.Next() {
-//		if iter.Value() > largest.Value() {
+//		if iter.Get() > largest.Get() {
 //			largest = iter.Clone()
 //		}
 //	}
@@ -83,7 +83,7 @@ func Reverse[T any, It iter.BidirIterator[T, It]](first, last It) {
 //func MinElement[T constraints.Ordered](first, last iter.ConstIterator[T]) iter.ConstIterator[T] {
 //	smallest := first
 //	for iter := first.Clone(); !iter.Equal(last); iter.Next() {
-//		if iter.Value() < smallest.Value() {
+//		if iter.Get() < smallest.Get() {
 //			smallest = iter.Clone()
 //		}
 //	}
