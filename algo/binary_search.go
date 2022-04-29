@@ -53,3 +53,11 @@ func UpperBound[T constraints.Ordered, It iter.ConstRandomIterator[T, It]](r ite
 func LowerBound[T constraints.Ordered, It iter.ConstRandomIterator[T, It]](r iter.Range[T, It], value T) It {
 	return LowerBoundIterators[T](r.Begin, r.End, value, xfn.Less[T])
 }
+
+func UpperBoundAny[T any, It iter.ConstRandomIterator[T, It]](r iter.Range[T, It], value T, comp xfn.Comparator[T]) It {
+	return UpperBoundIterators[T](r.Begin, r.End, value, comp)
+}
+
+func LowerBoundAny[T any, It iter.ConstRandomIterator[T, It]](r iter.Range[T, It], value T, comp xfn.Comparator[T]) It {
+	return LowerBoundIterators[T](r.Begin, r.End, value, comp)
+}

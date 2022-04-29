@@ -23,7 +23,7 @@ var float64s = [...]float64{74.3, 59.0, math.Inf(1), 238.2, -784.0, 2.3, math.Na
 var strings = [...]string{"", "Hello", "foo", "bar", "foo", "f00", "%*&^*&^&", "***"}
 
 func assertSorted[T constraints.Ordered](t *testing.T, s slice.Slice[T]) bool {
-	return assert.Truef(t, algo.IsSortedOrdered[T](s.Begin(), s.End()), "got: %v", s)
+	return assert.Truef(t, algo.IsSorted(s.Range()), "got: %v", s)
 }
 
 func randomInts() slice.Slice[int] {
@@ -36,7 +36,7 @@ func randomInts() slice.Slice[int] {
 	for i := 0; i < len(s); i++ {
 		s[i] = rng.Intn(100)
 	}
-	if algo.IsSortedOrdered[int](s.Begin(), s.End()) {
+	if algo.IsSorted(s.Range()) {
 		panic("terrible rand.rand")
 	}
 	return s
@@ -76,7 +76,7 @@ func TestSortAnyFloat64Slice(t *testing.T) {
 	s := slice.Copy(float64s[:])
 	xsort.Sort(s, xfn.LessFloat[float64])
 	t.Logf("got: %v", s)
-	assert.Truef(t, algo.IsSorted[float64](s.Begin(), s.End(), xfn.LessFloat[float64]), "got: %v", s)
+	assert.Truef(t, algo.IsSortedIterators[float64](s.Begin(), s.End(), xfn.LessFloat[float64]), "got: %v", s)
 }
 
 func TestSortAnyStringSlice(t *testing.T) {
@@ -124,7 +124,7 @@ func TestSortStableAnyIntSlice(t *testing.T) {
 func TestSortStableAnyFloat64Slice(t *testing.T) {
 	s := slice.Copy(float64s[:])
 	xsort.Stable(s, xfn.LessFloat[float64])
-	assert.Truef(t, algo.IsSorted[float64](s.Begin(), s.End(), xfn.LessFloat[float64]), "got: %v", s)
+	assert.Truef(t, algo.IsSortedIterators[float64](s.Begin(), s.End(), xfn.LessFloat[float64]), "got: %v", s)
 }
 
 func TestSortStableAnyStringSlice(t *testing.T) {
@@ -227,12 +227,12 @@ func TestStability(t *testing.T) {
 	for i := 0; i < len(data); i++ {
 		data[i].a = rng.Intn(m)
 	}
-	if algo.IsSorted(ds.Begin(), ds.End(), cmpIntPair) {
+	if algo.IsSortedIterators(ds.Begin(), ds.End(), cmpIntPair) {
 		t.Fatalf("terrible rand.rand")
 	}
 	data.initB()
 	xsort.Stable(data, cmpIntPair)
-	if !algo.IsSorted(ds.Begin(), ds.End(), cmpIntPair) {
+	if !algo.IsSortedIterators(ds.Begin(), ds.End(), cmpIntPair) {
 		t.Errorf("Stable didn't sort %d ints", n)
 	}
 	if !data.inOrder() {
@@ -242,7 +242,7 @@ func TestStability(t *testing.T) {
 	// already sorted
 	data.initB()
 	xsort.Stable(data, cmpIntPair)
-	if !algo.IsSorted(ds.Begin(), ds.End(), cmpIntPair) {
+	if !algo.IsSortedIterators(ds.Begin(), ds.End(), cmpIntPair) {
 		t.Errorf("Stable shuffled sorted %d ints (order)", n)
 	}
 	if !data.inOrder() {
@@ -255,7 +255,7 @@ func TestStability(t *testing.T) {
 	}
 	data.initB()
 	xsort.Stable(data, cmpIntPair)
-	if !algo.IsSorted(ds.Begin(), ds.End(), cmpIntPair) {
+	if !algo.IsSortedIterators(ds.Begin(), ds.End(), cmpIntPair) {
 		t.Errorf("Stable didn't sort %d ints", n)
 	}
 	if !data.inOrder() {

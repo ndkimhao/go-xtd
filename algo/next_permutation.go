@@ -9,7 +9,7 @@ import (
 func NextPermutationIterators[T any, It iter.RandomIterator[T, It]](first, last It, comp xfn.Comparator[T]) bool {
 	rFirst := iter.ReverseRandom[T](last)
 	rLast := iter.ReverseRandom[T](first)
-	left := IsSortedUntil(rFirst, rLast, comp)
+	left := IsSortedUntilIterators(rFirst, rLast, comp)
 	if !left.Equal(rLast) {
 		right := UpperBoundIterators[T](rFirst, left, left.Value(), comp)
 		Swap[T](left, right)
