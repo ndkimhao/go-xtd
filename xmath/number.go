@@ -1,4 +1,4 @@
-package zmath
+package xmath
 
 import (
 	"github.com/ndkimhao/go-xtd/constraints"

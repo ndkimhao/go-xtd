@@ -3,21 +3,23 @@ package xfn
 import (
 	"fmt"
 	"reflect"
+	"strings"
 
 	"github.com/ndkimhao/go-xtd/generics"
+	"github.com/ndkimhao/go-xtd/xmath"
 )
 
 type Placeholder int
 
 func (p Placeholder) String() string {
-	return fmt.Sprint("Placeholder(", p, ")")
+	return fmt.Sprint("Placeholder(", int(p), ")")
 }
 
 var (
 	P1 Placeholder = 1
-	P2             = 2
-	P3             = 3
-	P4             = 4
+	P2 Placeholder = 2
+	P3 Placeholder = 3
+	P4 Placeholder = 4
 )
 
 func P(i int) Placeholder {
@@ -41,7 +43,7 @@ func _ith(i int) string {
 	} else if lastDigit == 3 {
 		return fmt.Sprint(i, "rd")
 	} else {
-		return fmt.Sprint(i)
+		return fmt.Sprint(i, "th")
 	}
 }
 
@@ -49,11 +51,11 @@ func Bind[Dest any](src any, args ...any) Dest {
 	srcV := reflect.ValueOf(src)
 	srcT := srcV.Type()
 	if srcT.Kind() != reflect.Func {
-		panic(fmt.Sprintf("invaid type: src [%s] is not a func type", srcT))
+		panic(fmt.Sprintf("invalid type: src [%s] is not a function type", srcT))
 	}
 	destT := generics.TypeOf[Dest]()
 	if destT.Kind() != reflect.Func {
-		panic(fmt.Sprintf("invaid type: dest [%s] is not a func type", destT))
+		panic(fmt.Sprintf("invalid type: dest [%s] is not a function type", destT))
 	}
 	if srcT.NumOut() != destT.NumOut() {
 		panic(fmt.Sprintf("incompatible output: "+
@@ -77,39 +79,54 @@ func Bind[Dest any](src any, args ...any) Dest {
 	}
 	values := make([]reflect.Value, srcIn)
 	placeholders := []phInfo(nil)
-	nextP := 0
+	destIdx := 0
 	for i, a := range args {
 		if placeholder, ok := a.(Placeholder); ok {
-			pIdx := int(placeholder) - 1
-			if pIdx < 0 || destIn <= pIdx {
+			destPH := int(placeholder) - 1
+			if destPH < 0 || destIn <= destPH {
 				panic(fmt.Sprintf("invalid placeholder: "+
-					"dest [%s] has %d inputs but provided %s by %s bind argument",
+					"dest [%s] has %d inputs but provided %s at %s bind argument",
 					destT, destIn, placeholder, _ith(i+1)))
 			}
-			if srcT.In(i) != destT.In(pIdx) {
+			if srcT.In(i) != destT.In(destPH) {
 				panic(fmt.Sprintf("type mismatch: "+
-					"src [%s] %s input is [%s] but provided [%s] via %s",
-					srcT, _ith(i+1), srcT.In(i), destT.In(pIdx), placeholder))
+					"src [%s] %s input is [%s] but provided [%s] via %s at %s bind argument",
+					srcT, _ith(i+1), srcT.In(i), destT.In(destPH), placeholder, _ith(i+1)))
 			}
-			placeholders = append(placeholders, phInfo{fromArg: pIdx, toArg: i})
-			nextP = pIdx + 1
+			placeholders = append(placeholders, phInfo{fromArg: destPH, toArg: i})
+			destIdx = xmath.Max(destIdx, destPH+1)
 			continue
 		}
 		valA := reflect.ValueOf(a)
 		if !valA.CanConvert(srcT.In(i)) {
 			panic(fmt.Sprintf("type mismatch: "+
-				"src [%s] %s input is %s but provided %s",
-				srcT, _ith(i+1), srcT.In(i), valA.Type()))
+				"src [%s] %s input is [%s] but provided [%s] at %s bind argument",
+				srcT, _ith(i+1), srcT.In(i), valA.Type(), _ith(i+1)))
 		}
 		values[i] = valA.Convert(srcT.In(i))
 	}
-	if need, have := srcIn-len(args), destIn-nextP; need > have {
+	need := srcIn - len(args)
+	have := destIn - destIdx
+	if need > have {
+		missing := need - have
+		var sb strings.Builder
+		for i := srcIn - missing; i < srcIn; i++ {
+			sb.WriteString(srcT.In(i).String())
+			if i < srcIn-1 {
+				sb.WriteString(", ")
+			}
+		}
 		panic(fmt.Sprintf("not enough inputs: "+
-			"dest [%s] needs %d more inputs", destT, need-have))
+			"dest [%s] needs %d more inputs [%s]", destT, missing, sb.String()))
 	}
 	for i := len(args); i < srcIn; i++ {
-		placeholders = append(placeholders, phInfo{fromArg: nextP, toArg: i})
-		nextP++
+		if srcT.In(i) != destT.In(destIdx) {
+			panic(fmt.Sprintf("type mismatch: "+
+				"src [%s] %s input is [%s] but provided [%s] via %s dest input [%s]",
+				srcT, _ith(i+1), srcT.In(i), destT.In(destIdx), _ith(destIdx+1), destT))
+		}
+		placeholders = append(placeholders, phInfo{fromArg: destIdx, toArg: i})
+		destIdx++
 	}
 	fOut := reflect.MakeFunc(destT, func(args []reflect.Value) (results []reflect.Value) {
 		callValues := append([]reflect.Value(nil), values...)
