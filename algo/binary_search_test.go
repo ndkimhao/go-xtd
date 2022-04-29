@@ -14,7 +14,7 @@ func TestUpperBound(t *testing.T) {
 		//            0  1  2  3  4  5  6
 		s := slice.Of(1, 1, 2, 2, 3, 5, 7)
 		check := func(pos, val int) {
-			require.Equal(t, s.Begin().Add(pos), algo.UpperBoundOrdered(s.Begin(), s.End(), val))
+			require.Equal(t, s.Begin().Add(pos), algo.UpperBound(s.Range(), val))
 		}
 		check(0, 0)
 		check(2, 1)
@@ -30,7 +30,7 @@ func TestUpperBound(t *testing.T) {
 		//            0  1  2  3  4  5  6
 		s := slice.Of(7, 5, 3, 2, 2, 1, 1)
 		check := func(pos, val int) {
-			require.Equal(t, s.Begin().Add(pos+1), algo.UpperBoundOrdered(s.RBegin(), s.REnd(), val).Base())
+			require.Equal(t, s.Begin().Add(pos+1), algo.UpperBound(s.ReverseRange(), val).Base())
 		}
 		check(6, 0)
 		check(4, 1)
@@ -44,11 +44,11 @@ func TestUpperBound(t *testing.T) {
 	})
 	t.Run("Empty", func(t *testing.T) {
 		s := slice.Of[int]()
-		require.Equal(t, s.End(), algo.UpperBoundOrdered(s.Begin(), s.End(), 1))
+		require.Equal(t, s.End(), algo.UpperBound(s.Range(), 1))
 	})
 	t.Run("Empty Reversed", func(t *testing.T) {
 		s := slice.Of[int]()
-		require.Equal(t, s.REnd(), algo.UpperBoundOrdered(s.RBegin(), s.REnd(), 1))
+		require.Equal(t, s.REnd(), algo.UpperBound(s.ReverseRange(), 1))
 	})
 }
 
@@ -57,7 +57,7 @@ func TestLowerBound(t *testing.T) {
 		//            0  1  2  3  4  5  6
 		s := slice.Of(1, 1, 2, 2, 3, 5, 7)
 		check := func(pos, val int) {
-			require.Equal(t, s.Begin().Add(pos), algo.LowerBoundOrdered(s.Begin(), s.End(), val))
+			require.Equal(t, s.Begin().Add(pos), algo.LowerBound(s.Range(), val))
 		}
 		check(0, 0)
 		check(0, 1)
@@ -73,7 +73,7 @@ func TestLowerBound(t *testing.T) {
 		//            0  1  2  3  4  5  6
 		s := slice.Of(7, 5, 3, 2, 2, 1, 1)
 		check := func(pos, val int) {
-			require.Equal(t, s.Begin().Add(pos+1), algo.LowerBoundOrdered(s.RBegin(), s.REnd(), val).Base())
+			require.Equal(t, s.Begin().Add(pos+1), algo.LowerBound(s.ReverseRange(), val).Base())
 		}
 		check(6, 0)
 		check(6, 1)
@@ -87,10 +87,10 @@ func TestLowerBound(t *testing.T) {
 	})
 	t.Run("Empty", func(t *testing.T) {
 		s := slice.Of[int]()
-		require.Equal(t, s.End(), algo.LowerBoundOrdered(s.Begin(), s.End(), 1))
+		require.Equal(t, s.End(), algo.LowerBound(s.Range(), 1))
 	})
 	t.Run("Empty Reversed", func(t *testing.T) {
 		s := slice.Of[int]()
-		require.Equal(t, s.REnd(), algo.LowerBoundOrdered(s.RBegin(), s.REnd(), 1))
+		require.Equal(t, s.REnd(), algo.LowerBound(s.ReverseRange(), 1))
 	})
 }

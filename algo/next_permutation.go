@@ -11,7 +11,7 @@ func NextPermutationIterators[T any, It iter.RandomIterator[T, It]](first, last 
 	rLast := iter.ReverseRandom[T](first)
 	left := IsSortedUntil(rFirst, rLast, comp)
 	if !left.Equal(rLast) {
-		right := UpperBound[T](rFirst, left, left.Value(), comp)
+		right := UpperBoundIterators[T](rFirst, left, left.Value(), comp)
 		Swap[T](left, right)
 	}
 	Reverse[T](left.Base(), last)
