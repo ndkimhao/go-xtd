@@ -35,12 +35,12 @@ func (iter Iterator[T]) SetValue(val T) {
 }
 
 func (iter Iterator[T]) Next() Iterator[T] {
-	iter.Incr()
+	iter.Inc()
 	return iter
 }
 
 func (iter Iterator[T]) Prev() Iterator[T] {
-	iter.Decr()
+	iter.Dec()
 	return iter
 }
 
@@ -49,14 +49,14 @@ func (iter Iterator[T]) Add(offset int) Iterator[T] {
 	return iter
 }
 
-func (iter *Iterator[T]) Incr() {
+func (iter *Iterator[T]) Inc() {
 	if iter.pos >= iter.len {
 		panic("increment out of bound")
 	}
 	iter.pos++
 }
 
-func (iter *Iterator[T]) Decr() {
+func (iter *Iterator[T]) Dec() {
 	if iter.pos <= 0 {
 		panic("decrement out of bound")
 	}
