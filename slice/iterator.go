@@ -1,8 +1,6 @@
 package slice
 
 import (
-	"unsafe"
-
 	"github.com/ndkimhao/go-xtd/iter"
 	"github.com/ndkimhao/go-xtd/xtd"
 )
@@ -15,23 +13,19 @@ type Iterator[T any] struct {
 	_ xtd.NoCompare
 
 	pos int
-	len int
-	beg *T
+	s   Slice[T]
 }
 
 func (iter Iterator[T]) Ref() *T {
-	if iter.pos < 0 || iter.len <= iter.pos {
-		panic("ref out of bound")
-	}
-	return (*T)(unsafe.Add(unsafe.Pointer((*T)(iter.beg)), uintptr(iter.pos)*unsafe.Sizeof(*(*T)(nil))))
+	return &iter.s[iter.pos]
 }
 
 func (iter Iterator[T]) Get() T {
-	return *iter.Ref()
+	return iter.s[iter.pos]
 }
 
 func (iter Iterator[T]) Set(val T) {
-	*iter.Ref() = val
+	iter.s[iter.pos] = val
 }
 
 func (iter Iterator[T]) Next() Iterator[T] {
@@ -50,7 +44,7 @@ func (iter Iterator[T]) Add(offset int) Iterator[T] {
 }
 
 func (iter *Iterator[T]) Inc() {
-	if iter.pos >= iter.len {
+	if iter.pos >= len(iter.s) {
 		panic("increment out of bound")
 	}
 	iter.pos++
@@ -65,7 +59,7 @@ func (iter *Iterator[T]) Dec() {
 
 func (iter *Iterator[T]) Advance(offset int) {
 	k := iter.pos + offset
-	if k < 0 || iter.len < k {
+	if k < 0 || len(iter.s) < k {
 		panic("offset out of bound")
 	}
 	iter.pos = k
@@ -76,7 +70,7 @@ func (iter Iterator[T]) Pos() int {
 }
 
 func (iter Iterator[T]) Equal(other Iterator[T]) bool {
-	if iter.beg != other.beg {
+	if !ReferenceEqual(iter.s, other.s) {
 		panic("compare iterator of different slices")
 	}
 	return other.pos == iter.pos

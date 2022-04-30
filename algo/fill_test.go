@@ -28,4 +28,9 @@ func TestFillN(t *testing.T) {
 		algo.FillN(iter.Prepend[int](&s), 3, -1)
 		assert.Equal(t, slice.Of(-1, -1, -1, 0, 2).Slice(), s.ToSlice(nil))
 	})
+	t.Run("Insert", func(t *testing.T) {
+		s := slice.Of(0, 1, 2, 3, 4)
+		algo.FillN(iter.Insert[int, slice.Iterator[int]](s.IteratorAt(2), &s), 3, -1)
+		assert.Equal(t, slice.Of(0, 1, -1, -1, -1, 2, 3, 4), s)
+	})
 }

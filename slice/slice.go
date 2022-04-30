@@ -100,19 +100,14 @@ func (s Slice[T]) Last() T {
 }
 
 func (s Slice[T]) IteratorAt(pos int) Iterator[T] {
-	slen := s.Len()
-	if pos < 0 || slen < pos {
+	if pos < 0 || s.Len() < pos {
 		panic("out of bound")
 	}
-	var beg *T
-	if slen > 0 {
-		beg = &s[0]
-	}
-	return Iterator[T]{pos: pos, len: slen, beg: beg}
+	return Iterator[T]{pos: pos, s: s}
 }
 
 func (s Slice[T]) uncheckedIteratorAt(pos int) Iterator[T] {
-	return Iterator[T]{pos: pos, len: len(s), beg: &s[0]}
+	return Iterator[T]{pos: pos, s: s}
 }
 
 func (s Slice[T]) Begin() Iterator[T] {
@@ -160,7 +155,7 @@ func (s Slice[T]) Reversed() Slice[T] {
 }
 
 func (s *Slice[T]) checkIterator(it Iterator[T]) {
-	if !((it.beg == nil && *s == nil) || it.beg == &(*s)[0]) {
-		panic("invalid iterator")
+	if !ReferenceEqual(*s, it.s) {
+		panic("iterator does not belongs to this slice")
 	}
 }
