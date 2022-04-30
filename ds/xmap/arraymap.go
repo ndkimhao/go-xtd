@@ -84,3 +84,8 @@ func (p *ArrayMap[K, V]) ValueAt(i int) V {
 func (p *ArrayMap[K, V]) KeyAt(i int) K {
 	return p.kv[i].Key
 }
+
+func (p *ArrayMap[K, V]) Clear() {
+	Clear(p.pos)
+	p.kv = nil
+}

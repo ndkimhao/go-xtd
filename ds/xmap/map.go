@@ -35,6 +35,6 @@ func (m Map[K, V]) Map() map[K]V {
 	return m
 }
 
-func (m *Map[K, V]) Clear() {
-	*m = map[K]V{}
+func (m Map[K, V]) Clear() {
+	Clear(m)
 }

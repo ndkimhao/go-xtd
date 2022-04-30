@@ -27,3 +27,12 @@ func Values[K comparable, V any](m map[K]V) []V {
 func Delete[K comparable, V any](m map[K]V, key K) {
 	delete(m, key)
 }
+
+func Clear[K comparable, V any](m map[K]V) {
+	// Go 1.15 optimizes this loop into runtime.mapclear()
+	// Might not work for interface key type
+	// https://github.com/golang/go/issues/45328
+	for k := range m {
+		delete(m, k)
+	}
+}

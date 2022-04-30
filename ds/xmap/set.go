@@ -39,8 +39,8 @@ func (s Set[T]) Len() int {
 	return len(s)
 }
 
-func (s *Set[T]) Clear() {
-	*s = map[T]struct{}{}
+func (s Set[T]) Clear() {
+	Clear(s)
 }
 
 func (s Set[T]) Raw() map[T]struct{} {
