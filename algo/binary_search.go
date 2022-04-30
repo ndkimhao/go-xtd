@@ -7,7 +7,7 @@ import (
 )
 
 func UpperBoundIterators[T any, It iter.ConstRandomIterator[T, It]](first, last It, value T, comp xfn.Comparator[T]) It {
-	count := iter.Distance(first, last)
+	count := iter.Distance[T](first, last)
 	if count < 0 {
 		panic("invalid range")
 	}
@@ -27,7 +27,7 @@ func UpperBoundIterators[T any, It iter.ConstRandomIterator[T, It]](first, last 
 }
 
 func LowerBoundIterators[T any, It iter.ConstRandomIterator[T, It]](first, last It, value T, comp xfn.Comparator[T]) It {
-	count := iter.Distance(first, last)
+	count := iter.Distance[T](first, last)
 	if count < 0 {
 		panic("invalid range")
 	}

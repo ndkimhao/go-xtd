@@ -2,6 +2,7 @@ package xslice
 
 import (
 	"github.com/ndkimhao/go-xtd/ds/iter"
+	"github.com/ndkimhao/go-xtd/stream"
 )
 
 type Slice[T any] []T
@@ -152,6 +153,10 @@ func (s Slice[T]) Reversed() Slice[T] {
 		r[last-i] = v
 	}
 	return r
+}
+
+func (s Slice[T]) Stream() *stream.Stream[T] {
+	return stream.OfSlice(s)
 }
 
 func (s *Slice[T]) checkIterator(it Iterator[T]) {

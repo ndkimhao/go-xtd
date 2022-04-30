@@ -1,5 +1,9 @@
 package xmap
 
+import (
+	"github.com/ndkimhao/go-xtd/stream"
+)
+
 type Entry[K any, V any] struct {
 	Key   K
 	Value V
@@ -37,4 +41,8 @@ func (m Map[K, V]) Map() map[K]V {
 
 func (m Map[K, V]) Clear() {
 	Clear(m)
+}
+
+func (m Map[K, V]) Stream() *stream.Stream[Entry[K, V]] {
+	return stream.OfSlice(m.Entries())
 }
