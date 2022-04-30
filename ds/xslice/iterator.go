@@ -1,7 +1,8 @@
-package slice
+package xslice
 
 import (
-	"github.com/ndkimhao/go-xtd/iter"
+	"github.com/ndkimhao/go-xtd/ds/iter"
+
 	"github.com/ndkimhao/go-xtd/xtd"
 )
 

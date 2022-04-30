@@ -13,7 +13,7 @@ import (
 
 	"github.com/ndkimhao/go-xtd/algo"
 	"github.com/ndkimhao/go-xtd/constraints"
-	"github.com/ndkimhao/go-xtd/slice"
+	"github.com/ndkimhao/go-xtd/ds/xslice"
 	"github.com/ndkimhao/go-xtd/xfn"
 	"github.com/ndkimhao/go-xtd/xsort"
 )
@@ -22,16 +22,16 @@ var ints = [...]int{74, 59, 238, -784, 9845, 959, 905, 0, 0, 42, 7586, -5467984,
 var float64s = [...]float64{74.3, 59.0, math.Inf(1), 238.2, -784.0, 2.3, math.NaN(), math.NaN(), math.Inf(-1), 9845.768, -959.7485, 905, 7.8, 7.8}
 var strings = [...]string{"", "Hello", "foo", "bar", "foo", "f00", "%*&^*&^&", "***"}
 
-func assertSorted[T constraints.Ordered](t *testing.T, s slice.Slice[T]) bool {
+func assertSorted[T constraints.Ordered](t *testing.T, s xslice.Slice[T]) bool {
 	return assert.Truef(t, algo.IsSorted(s.Range()), "got: %v", s)
 }
 
-func randomInts() slice.Slice[int] {
+func randomInts() xslice.Slice[int] {
 	n := 1000000
 	if testing.Short() {
 		n /= 100
 	}
-	s := slice.NewLen[int](n)
+	s := xslice.NewLen[int](n)
 	rng := rand.New(rand.NewSource(1))
 	for i := 0; i < len(s); i++ {
 		s[i] = rng.Intn(100)
@@ -43,19 +43,19 @@ func randomInts() slice.Slice[int] {
 }
 
 func TestSortIntSlice(t *testing.T) {
-	s := slice.Copy(ints[:])
+	s := xslice.Copy(ints[:])
 	xsort.SortOrdered(s)
 	assertSorted[int](t, s)
 }
 
 func TestSortFloat64Slice(t *testing.T) {
-	s := slice.Copy(float64s[:])
+	s := xslice.Copy(float64s[:])
 	xsort.SortOrdered(s)
 	assertSorted[float64](t, s)
 }
 
 func TestSortStringSlice(t *testing.T) {
-	s := slice.Copy(strings[:])
+	s := xslice.Copy(strings[:])
 	xsort.SortOrdered(s)
 	assertSorted[string](t, s)
 }
@@ -67,20 +67,20 @@ func TestSortLarge_Random(t *testing.T) {
 }
 
 func TestSortAnyIntSlice(t *testing.T) {
-	s := slice.Copy(ints[:])
+	s := xslice.Copy(ints[:])
 	xsort.Sort(s, xfn.Less[int])
 	assertSorted[int](t, s)
 }
 
 func TestSortAnyFloat64Slice(t *testing.T) {
-	s := slice.Copy(float64s[:])
+	s := xslice.Copy(float64s[:])
 	xsort.Sort(s, xfn.LessFloat[float64])
 	t.Logf("got: %v", s)
 	assert.Truef(t, algo.IsSortedIterators[float64](s.Begin(), s.End(), xfn.LessFloat[float64]), "got: %v", s)
 }
 
 func TestSortAnyStringSlice(t *testing.T) {
-	s := slice.Copy(strings[:])
+	s := xslice.Copy(strings[:])
 	xsort.Sort(s, xfn.Less[string])
 	assertSorted[string](t, s)
 }
@@ -92,19 +92,19 @@ func TestSortAnyLarge_Random(t *testing.T) {
 }
 
 func TestSortStableIntSlice(t *testing.T) {
-	s := slice.Copy(ints[:])
+	s := xslice.Copy(ints[:])
 	xsort.StableOrdered(s)
 	assertSorted[int](t, s)
 }
 
 func TestSortStableFloat64Slice(t *testing.T) {
-	s := slice.Copy(float64s[:])
+	s := xslice.Copy(float64s[:])
 	xsort.StableOrdered(s)
 	assertSorted[float64](t, s)
 }
 
 func TestSortStableStringSlice(t *testing.T) {
-	s := slice.Copy(strings[:])
+	s := xslice.Copy(strings[:])
 	xsort.StableOrdered(s)
 	assertSorted[string](t, s)
 }
@@ -116,19 +116,19 @@ func TestSortStableLarge_Random(t *testing.T) {
 }
 
 func TestSortStableAnyIntSlice(t *testing.T) {
-	s := slice.Copy(ints[:])
+	s := xslice.Copy(ints[:])
 	xsort.Stable(s, xfn.Less[int])
 	assertSorted[int](t, s)
 }
 
 func TestSortStableAnyFloat64Slice(t *testing.T) {
-	s := slice.Copy(float64s[:])
+	s := xslice.Copy(float64s[:])
 	xsort.Stable(s, xfn.LessFloat[float64])
 	assert.Truef(t, algo.IsSortedIterators[float64](s.Begin(), s.End(), xfn.LessFloat[float64]), "got: %v", s)
 }
 
 func TestSortStableAnyStringSlice(t *testing.T) {
-	s := slice.Copy(strings[:])
+	s := xslice.Copy(strings[:])
 	xsort.Stable(s, xfn.Less[string])
 	assertSorted[string](t, s)
 }
@@ -140,17 +140,17 @@ func TestSortStableAnyLarge_Random(t *testing.T) {
 }
 
 func TestReverseSortIntSlice(t *testing.T) {
-	a := slice.Copy(ints[:])
+	a := xslice.Copy(ints[:])
 	xsort.SortOrdered(a)
-	b := slice.Copy(ints[:])
+	b := xslice.Copy(ints[:])
 	xsort.Sort(b, xfn.Greater[int])
 	assert.Equal(t, b.Reversed(), a)
 }
 
 func TestReverseSortStableIntSlice(t *testing.T) {
-	a := slice.Copy(ints[:])
+	a := xslice.Copy(ints[:])
 	xsort.StableOrdered(a)
-	b := slice.Copy(ints[:])
+	b := xslice.Copy(ints[:])
 	xsort.Stable(b, xfn.Greater[int])
 	assert.Equal(t, b.Reversed(), a)
 }
@@ -177,7 +177,7 @@ func TestNonDeterministicComparison(t *testing.T) {
 		}
 	}()
 
-	s := slice.NewLen[int](500)
+	s := xslice.NewLen[int](500)
 	r := rand.New(rand.NewSource(0))
 
 	for i := 0; i < 10; i++ {
@@ -186,7 +186,7 @@ func TestNonDeterministicComparison(t *testing.T) {
 }
 
 type intPair struct{ a, b int }
-type intPairs slice.Slice[intPair]
+type intPairs xslice.Slice[intPair]
 
 func cmpIntPair(x, y intPair) bool { return x.a < y.a }
 
@@ -220,7 +220,7 @@ func TestStability(t *testing.T) {
 		n, m = 1000, 100
 	}
 	data := make(intPairs, n)
-	ds := slice.Slice[intPair](data)
+	ds := xslice.Slice[intPair](data)
 
 	// random distribution
 	rng := rand.New(rand.NewSource(1))

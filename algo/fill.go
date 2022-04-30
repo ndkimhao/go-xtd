@@ -1,7 +1,7 @@
 package algo
 
 import (
-	"github.com/ndkimhao/go-xtd/iter"
+	"github.com/ndkimhao/go-xtd/ds/iter"
 )
 
 func FillN[T any, It iter.Iterator[T, It]](first It, count int, value T) It {

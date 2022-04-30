@@ -1,7 +1,7 @@
-package slice
+package xslice
 
 import (
-	"github.com/ndkimhao/go-xtd/iter"
+	"github.com/ndkimhao/go-xtd/ds/iter"
 )
 
 type Slice[T any] []T

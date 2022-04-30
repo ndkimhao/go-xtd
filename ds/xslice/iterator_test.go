@@ -1,16 +1,16 @@
-package slice_test
+package xslice_test
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/ndkimhao/go-xtd/slice"
+	"github.com/ndkimhao/go-xtd/ds/xslice"
 )
 
 func TestIterator(t *testing.T) {
 	t.Run("Normal", func(t *testing.T) {
-		s := slice.Of(1, 2, 3)
+		s := xslice.Of(1, 2, 3)
 		it := s.Begin()
 		assert.Equal(t, &s[0], it.Ref())
 		assert.Equal(t, 1, it.Get())
@@ -30,7 +30,7 @@ func TestIterator(t *testing.T) {
 		assert.Equal(t, &s[2], s.Begin().Add(2).Add(0).Ref())
 	})
 	t.Run("Empty", func(t *testing.T) {
-		s := slice.Of[int]()
+		s := xslice.Of[int]()
 		assert.True(t, s.Begin().Equal(s.End()))
 		assert.Panics(t, func() { s.Begin().Ref() })
 	})

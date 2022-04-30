@@ -5,9 +5,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/ndkimhao/go-xtd/ds/xmap"
 	"github.com/ndkimhao/go-xtd/hasher"
 	"github.com/ndkimhao/go-xtd/xfn"
-	"github.com/ndkimhao/go-xtd/xmap"
 )
 
 type MyKey struct {

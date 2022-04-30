@@ -1,8 +1,8 @@
 package stream
 
 import (
-	"github.com/ndkimhao/go-xtd/slice"
-	"github.com/ndkimhao/go-xtd/xmap"
+	xmap2 "github.com/ndkimhao/go-xtd/ds/xmap"
+	"github.com/ndkimhao/go-xtd/ds/xslice"
 )
 
 func OfSlice[T any](slice []T) *Stream[T] {
@@ -13,10 +13,10 @@ func Of[T any](values ...T) *Stream[T] {
 	return OfSlice(values)
 }
 
-func OfVec[T any](v slice.Slice[T]) *Stream[T] {
+func OfVec[T any](v xslice.Slice[T]) *Stream[T] {
 	return OfSlice(v.Slice())
 }
 
-func OfMap[K comparable, V any](m map[K]V) *Stream[xmap.Entry[K, V]] {
-	return OfSlice(xmap.Entries(m))
+func OfMap[K comparable, V any](m map[K]V) *Stream[xmap2.Entry[K, V]] {
+	return OfSlice(xmap2.Entries(m))
 }

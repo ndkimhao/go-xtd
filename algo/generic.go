@@ -1,7 +1,7 @@
 package algo
 
 import (
-	"github.com/ndkimhao/go-xtd/iter"
+	"github.com/ndkimhao/go-xtd/ds/iter"
 )
 
 // Swap swaps the value of two iterator
