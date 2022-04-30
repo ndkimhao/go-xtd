@@ -112,27 +112,42 @@ func TestSlice_Reversed(t *testing.T) {
 func TestSlice_Insert(t *testing.T) {
 	t.Run("From Empty", func(t *testing.T) {
 		s := slice.Of[int]()
-		s.Insert(0, 5)
+		s.InsertAt(0, 5)
 		assert.Equal(t, slice.Of(5), s)
 	})
 	t.Run("Begin", func(t *testing.T) {
 		s := slice.Of(1, 2, 3)
-		s.Insert(0, 5)
+		s.InsertAt(0, 5)
 		assert.Equal(t, slice.Of(5, 1, 2, 3), s)
 	})
 	t.Run("Last", func(t *testing.T) {
 		s := slice.Of(1, 2, 3)
-		s.Insert(3, 5)
+		s.InsertAt(3, 5)
 		assert.Equal(t, slice.Of(1, 2, 3, 5), s)
 	})
 	t.Run("Middle", func(t *testing.T) {
 		s := slice.Of(1, 2, 3, 4, 5, 6)
-		s.Insert(2, 10)
+		s.InsertAt(2, 10)
 		assert.Equal(t, slice.Of(1, 2, 10, 3, 4, 5, 6), s)
 	})
 	t.Run("Panic", func(t *testing.T) {
 		s := slice.Of(1, 2, 3)
-		assert.Panics(t, func() { s.Insert(-1, 10) })
-		assert.Panics(t, func() { s.Insert(4, 10) })
+		assert.Panics(t, func() { s.InsertAt(-1, 10) })
+		assert.Panics(t, func() { s.InsertAt(4, 10) })
+	})
+}
+
+func TestInsert(t *testing.T) {
+	t.Run("Invalid", func(t *testing.T) {
+		s := slice.Of(1, 2)
+		v := slice.Of(1, 2)
+		assert.PanicsWithValue(t, "invalid iterator", func() { s.Insert(v.Begin(), 0) })
+	})
+	t.Run("Normal", func(t *testing.T) {
+		s := slice.Of(1, 2, 3)
+		it := s.Insert(s.Begin().Add(1), 4)
+		assert.Equal(t, 4, it.Get())
+		assert.True(t, it.Equal(s.Begin().Add(1)))
+		assert.Equal(t, slice.Of(1, 4, 2, 3), s)
 	})
 }

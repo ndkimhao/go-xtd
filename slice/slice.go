@@ -53,8 +53,14 @@ func (s *Slice[T]) UnorderedDelete(i int) {
 	*s = UnorderedDelete(*s, i)
 }
 
-func (s *Slice[T]) Insert(i int, value T) {
+func (s *Slice[T]) InsertAt(i int, value T) {
 	*s = Insert(*s, i, value)
+}
+
+func (s *Slice[T]) Insert(it Iterator[T], value T) Iterator[T] {
+	s.checkIterator(it)
+	*s = Insert(*s, it.pos, value)
+	return s.uncheckedIteratorAt(it.pos)
 }
 
 func (s Slice[T]) Len() int {
@@ -105,6 +111,10 @@ func (s Slice[T]) IteratorAt(pos int) Iterator[T] {
 	return Iterator[T]{pos: pos, len: slen, beg: beg}
 }
 
+func (s Slice[T]) uncheckedIteratorAt(pos int) Iterator[T] {
+	return Iterator[T]{pos: pos, len: len(s), beg: &s[0]}
+}
+
 func (s Slice[T]) Begin() Iterator[T] {
 	return s.IteratorAt(0)
 }
@@ -147,4 +157,10 @@ func (s Slice[T]) Reversed() Slice[T] {
 		r[last-i] = v
 	}
 	return r
+}
+
+func (s *Slice[T]) checkIterator(it Iterator[T]) {
+	if !((it.beg == nil && *s == nil) || it.beg == &(*s)[0]) {
+		panic("invalid iterator")
+	}
 }
