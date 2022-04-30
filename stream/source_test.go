@@ -28,3 +28,16 @@ func TestGenerate(t *testing.T) {
 		assert.Equal(t, v2, v1)
 	})
 }
+
+func TestOfRange(t *testing.T) {
+	t.Run("Normal", func(t *testing.T) {
+		s := xslice.Of(0, 1, 2, 3, 4)
+		r := stream.OfRange(s.Range()).Skip(3).Map(func(i int) int { return i * 2 }).Slice()
+		assert.Equal(t, []int{6, 8}, r)
+	})
+	t.Run("Skip All", func(t *testing.T) {
+		s := xslice.Of(0, 1, 2, 3, 4)
+		r := stream.OfRange(s.Range()).Skip(10).Slice()
+		assert.Equal(t, []int(nil), r)
+	})
+}

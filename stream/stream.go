@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/ndkimhao/go-xtd/generics"
 	"github.com/ndkimhao/go-xtd/xfn"
 	"github.com/ndkimhao/go-xtd/xtd"
 )
@@ -98,8 +99,7 @@ loop_src:
 	}
 end_of_stream:
 	s.clear()
-	var zero T
-	return zero, false
+	return generics.ZeroOf[T](), false
 }
 
 func (s *Stream[T]) SkipNext(n int) (skipped int) {

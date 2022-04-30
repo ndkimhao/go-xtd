@@ -1,9 +1,6 @@
 package iter
 
-func Distance[T interface {
-	Pos() int
-	Equal(T) bool
-}](a, b T) int {
+func Distance[T any, It ConstRandomIterator[T, It]](a, b It) int {
 	_ = a.Equal(b)
 	return b.Pos() - a.Pos()
 }
