@@ -24,17 +24,17 @@ type Shard[K comparable, V any] struct {
 
 var DefaultShards = runtime.NumCPU() * 2
 
-func New[K comparable, V any]() Sharded[K, V] {
-	return NewShards[K, V](DefaultShards)
+func NewSharded[K comparable, V any]() Sharded[K, V] {
+	return NewShardedCustom[K, V](DefaultShards, hasher.Of[K]().HashSeed)
 }
 
-func NewShards[K comparable, V any](shards int) Sharded[K, V] {
+func NewShardedCustom[K comparable, V any](shards int, hasher xfn.BiFunction[K, uint64, uint64]) Sharded[K, V] {
 	if shards <= 0 {
 		panic(fmt.Sprint("invalid number of shards: ", shards))
 	}
 	m := Sharded[K, V]{
 		shards: make([]Shard[K, V], shards),
-		hasher: hasher.Of[K]().HashSeed,
+		hasher: hasher,
 		seed:   xrand.Uint64(),
 	}
 	for i := range m.shards {

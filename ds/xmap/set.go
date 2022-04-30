@@ -39,8 +39,8 @@ func (s Set[T]) Len() int {
 	return len(s)
 }
 
-func (s Set[T]) Clear() {
-	s = map[T]struct{}{}
+func (s *Set[T]) Clear() {
+	*s = map[T]struct{}{}
 }
 
 func (s Set[T]) Raw() map[T]struct{} {
@@ -48,9 +48,5 @@ func (s Set[T]) Raw() map[T]struct{} {
 }
 
 func (s Set[T]) Values() []T {
-	a := make([]T, 0, len(s))
-	for v := range s {
-		a = append(a, v)
-	}
-	return a
+	return Keys(s)
 }
