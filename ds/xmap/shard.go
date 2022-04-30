@@ -237,3 +237,14 @@ func (m Sharded[K, V]) ToMap() map[K]V {
 func (m Sharded[K, V]) MarshalJSON() ([]byte, error) {
 	return json.Marshal(m.ToMap())
 }
+
+func (m Sharded[K, V]) Clear() {
+	for i := range m.shards {
+		func() {
+			shard := &m.shards[i]
+			shard.RLock()
+			defer shard.RUnlock()
+			shard.items = map[K]V{}
+		}()
+	}
+}
