@@ -40,7 +40,7 @@ func (s Set[T]) Len() int {
 }
 
 func (s Set[T]) Clear() {
-	s = map[T]struct{}{}
+	Clear(s)
 }
 
 func (s Set[T]) Raw() map[T]struct{} {
@@ -48,9 +48,5 @@ func (s Set[T]) Raw() map[T]struct{} {
 }
 
 func (s Set[T]) Values() []T {
-	a := make([]T, 0, len(s))
-	for v := range s {
-		a = append(a, v)
-	}
-	return a
+	return Keys(s)
 }

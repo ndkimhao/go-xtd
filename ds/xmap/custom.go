@@ -1,7 +1,7 @@
 package xmap
 
 import (
-	"github.com/ndkimhao/go-xtd/vec"
+	"github.com/ndkimhao/go-xtd/ds/xslice"
 	"github.com/ndkimhao/go-xtd/xfn"
 )
 
@@ -83,7 +83,7 @@ func (m Custom[K, V]) Delete(key K) (ok bool) {
 	}
 	for i, entry := range overflow {
 		if m.equal(entry.Key, key) {
-			m.ovf[hash] = vec.UnorderedDelete(overflow, i)
+			m.ovf[hash] = xslice.UnorderedDelete(overflow, i)
 			return true // found in overflow
 		}
 	}

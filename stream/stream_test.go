@@ -7,8 +7,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
+	"github.com/ndkimhao/go-xtd/ds/xslice"
 	"github.com/ndkimhao/go-xtd/stream"
-	"github.com/ndkimhao/go-xtd/vec"
 )
 
 type MockIterator[T any] struct {
@@ -106,8 +106,8 @@ func TestStream_Map(t *testing.T) {
 
 func TestStream_Peek(t *testing.T) {
 	t.Run("Simple", func(t *testing.T) {
-		a := vec.New[int]()
-		r := vec.New[int]()
+		a := xslice.New[int]()
+		r := xslice.New[int]()
 		stream.
 			Range(0, 9, 3).
 			Peek(a.Append).

@@ -1,5 +1,9 @@
 package xmap
 
+import (
+	"github.com/ndkimhao/go-xtd/stream"
+)
+
 type Entry[K any, V any] struct {
 	Key   K
 	Value V
@@ -11,28 +15,20 @@ func NewEntry[K, V any](key K, value V) Entry[K, V] {
 
 type Map[K comparable, V any] map[K]V
 
+func NewMap[K comparable, V any]() Map[K, V] {
+	return map[K]V{}
+}
+
 func (m Map[K, V]) Entries() []Entry[K, V] {
-	var entries []Entry[K, V]
-	for k, v := range m {
-		entries = append(entries, Entry[K, V]{Key: k, Value: v})
-	}
-	return entries
+	return Entries(m)
 }
 
 func (m Map[K, V]) Keys() []K {
-	var keys []K
-	for k := range m {
-		keys = append(keys, k)
-	}
-	return keys
+	return Keys(m)
 }
 
 func (m Map[K, V]) Values() []V {
-	var values []V
-	for _, v := range m {
-		values = append(values, v)
-	}
-	return values
+	return Values(m)
 }
 
 func (m Map[K, V]) Delete(key K) {
@@ -41,4 +37,12 @@ func (m Map[K, V]) Delete(key K) {
 
 func (m Map[K, V]) Map() map[K]V {
 	return m
+}
+
+func (m Map[K, V]) Clear() {
+	Clear(m)
+}
+
+func (m Map[K, V]) Stream() *stream.Stream[Entry[K, V]] {
+	return stream.OfSlice(m.Entries())
 }

@@ -12,8 +12,8 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/zeebo/xxh3"
 
+	"github.com/ndkimhao/go-xtd/ds/xmap"
 	"github.com/ndkimhao/go-xtd/xhash"
-	"github.com/ndkimhao/go-xtd/xmap"
 )
 
 // Basic test, ensure no sticky 0/1 bits

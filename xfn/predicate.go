@@ -22,13 +22,13 @@ func (p Predicate[T]) Neg() Predicate[T] {
 	return func(v T) bool { return !p(v) }
 }
 
-func Eq[T comparable](rhs T) Predicate[T] {
+func IsEq[T comparable](rhs T) Predicate[T] {
 	return func(lhs T) bool {
 		return lhs == rhs
 	}
 }
 
-func EqAny[T comparable](rhs ...T) Predicate[T] {
+func IsEqAny[T comparable](rhs ...T) Predicate[T] {
 	return func(v T) bool {
 		for _, r := range rhs {
 			if v == r {
@@ -39,13 +39,13 @@ func EqAny[T comparable](rhs ...T) Predicate[T] {
 	}
 }
 
-func Neq[T comparable](rhs T) Predicate[T] {
+func IsNeq[T comparable](rhs T) Predicate[T] {
 	return func(lhs T) bool {
 		return lhs != rhs
 	}
 }
 
-func NeqAny[T comparable](rhs ...T) Predicate[T] {
+func IsNeqAny[T comparable](rhs ...T) Predicate[T] {
 	return func(v T) bool {
 		for _, r := range rhs {
 			if v == r {
@@ -100,78 +100,88 @@ func Not[T any](fns ...Predicate[T]) Predicate[T] {
 	}
 }
 
-func Greater[T constraints.Ordered](rhs T) Predicate[T] {
+func IsGreater[T constraints.Ordered](rhs T) Predicate[T] {
 	return func(v T) bool {
 		return v > rhs
 	}
 }
 
-func GreaterEq[T constraints.Ordered](rhs T) Predicate[T] {
+func IsGreaterEq[T constraints.Ordered](rhs T) Predicate[T] {
 	return func(v T) bool {
 		return v >= rhs
 	}
 }
 
-func Less[T constraints.Ordered](rhs T) Predicate[T] {
+func IsLess[T constraints.Ordered](rhs T) Predicate[T] {
 	return func(v T) bool {
 		return v < rhs
 	}
 }
 
-func LessEq[T constraints.Ordered](rhs T) Predicate[T] {
+func IsLessEq[T constraints.Ordered](rhs T) Predicate[T] {
 	return func(v T) bool {
 		return v <= rhs
 	}
 }
 
-func Prefix(prefix string) Predicate[string] {
+func HasPrefix(prefix string) Predicate[string] {
 	return func(v string) bool {
 		i := len(prefix)
 		return len(v) >= i && v[:i] == prefix
 	}
 }
 
-func Suffix(suffix string) Predicate[string] {
+func HasSuffix(suffix string) Predicate[string] {
 	return func(v string) bool {
 		i := len(suffix)
 		return len(v) >= i && v[len(v)-i:] == suffix
 	}
 }
 
-func PrefixBytes(prefix []byte) Predicate[[]byte] {
+func HasPrefixBytes(prefix []byte) Predicate[[]byte] {
 	return func(v []byte) bool {
 		i := len(prefix)
 		return len(v) >= i && bytes.Equal(v[:i], prefix)
 	}
 }
 
-func SuffixBytes(suffix []byte) Predicate[[]byte] {
+func HasSuffixBytes(suffix []byte) Predicate[[]byte] {
 	return func(v []byte) bool {
 		i := len(suffix)
 		return len(v) >= i && bytes.Equal(v[len(v)-i:], suffix)
 	}
 }
 
-func EqOp[T comparable](lhs, rhs T) bool {
+func Equal[T comparable](lhs, rhs T) bool {
 	return lhs == rhs
 }
 
-func NeqEqOp[T comparable](lhs, rhs T) bool {
+func NotEqual[T comparable](lhs, rhs T) bool {
 	return lhs != rhs
 }
 
-func GreaterOp[T constraints.Ordered](lhs, rhs T) bool {
+func Greater[T constraints.Ordered](lhs, rhs T) bool {
 	return lhs > rhs
 }
 
-func GreaterEqOp[T constraints.Ordered](lhs, rhs T) bool {
+func GreaterEq[T constraints.Ordered](lhs, rhs T) bool {
 	return lhs >= rhs
 }
 
-func LessOp[T constraints.Ordered](lhs, rhs T) bool {
+func Less[T constraints.Ordered](lhs, rhs T) bool {
 	return lhs < rhs
 }
 
-func LessEqOp[T constraints.Ordered](lhs, rhs T) bool {
+func LessEq[T constraints.Ordered](lhs, rhs T) bool {
 	return lhs <= rhs
+}
+
+func LessFloat[T constraints.Float](lhs, rhs T) bool {
+	lhsNan := lhs != lhs
+	rhsNan := rhs != rhs
+	if lhsNan || rhsNan {
+		return lhsNan && !rhsNan
+	} else {
+		return lhs < rhs
+	}
 }

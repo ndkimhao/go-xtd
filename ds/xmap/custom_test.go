@@ -5,9 +5,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/ndkimhao/go-xtd/ds/xmap"
 	"github.com/ndkimhao/go-xtd/hasher"
 	"github.com/ndkimhao/go-xtd/xfn"
-	"github.com/ndkimhao/go-xtd/xmap"
 )
 
 type MyKey struct {
@@ -16,7 +16,7 @@ type MyKey struct {
 }
 
 func TestNewCustom(t *testing.T) {
-	m := xmap.NewCustom[MyKey, int](hasher.HashOp[MyKey](), xfn.EqOp[MyKey])
+	m := xmap.NewCustom[MyKey, int](hasher.HashOp[MyKey](), xfn.Equal[MyKey])
 	assert.True(t, m.Set(MyKey{a: "1"}, 1))
 	assert.False(t, m.Set(MyKey{a: "1"}, 1))
 	v, ok := m.Get(MyKey{a: "1"})
