@@ -1,12 +1,14 @@
-package priority_queue
+package priority_queue_test
 
 import (
 	"strings"
 	"testing"
+
+	"github.com/ndkimhao/go-xtd/priority_queue"
 )
 
 func TestPush(t *testing.T) {
-	queue := New[int](
+	queue := priority_queue.New[int](
 		func(a, b int) bool {
 			return a < b
 		},
@@ -26,7 +28,7 @@ func TestPush(t *testing.T) {
 }
 
 func TestPop(t *testing.T) {
-	queue := New[int](
+	queue := priority_queue.New[int](
 		func(a, b int) bool {
 			return a < b
 		},
@@ -61,7 +63,7 @@ func TestPop(t *testing.T) {
 }
 
 func TestGenericString(t *testing.T) {
-	queue := New[string](
+	queue := priority_queue.New[string](
 		func(a, b string) bool {
 			if strings.Compare(a, b) < 0 {
 				return true
@@ -89,7 +91,7 @@ func TestGenericString(t *testing.T) {
 }
 
 func TestPushPopPushPop(t *testing.T) {
-	queue := New[int](
+	queue := priority_queue.New[int](
 		func(a, b int) bool {
 			return a > b
 		},
